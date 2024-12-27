@@ -10,120 +10,161 @@
 #include <stdio.h>
 #include <string.h>
 #include "../include/gopt.h"
-
-/*
-#define EXTCAP_PIPE_PREFIX "wireshark_extcap"
-#define EXTCAP_CONTROL_IN_PREFIX  "wireshark_control_ext_to_ws"
-#define EXTCAP_CONTROL_OUT_PREFIX "wireshark_control_ws_to_ext"
-
-#define EXTCAP_ARGUMENT_CONFIG                  "--extcap-config"
-#define EXTCAP_ARGUMENT_RELOAD_OPTION           "--extcap-reload-option"
-#define EXTCAP_ARGUMENT_LIST_INTERFACES         "--extcap-interfaces"
-#define EXTCAP_ARGUMENT_INTERFACE               "--extcap-interface"
-#define EXTCAP_ARGUMENT_LIST_DLTS               "--extcap-dlts"
-#define EXTCAP_ARGUMENT_VERSION                 "--extcap-version"
-
-#define EXTCAP_ARGUMENT_RUN_CAPTURE             "--capture"
-#define EXTCAP_ARGUMENT_CAPTURE_FILTER          "--extcap-capture-filter"
-#define EXTCAP_ARGUMENT_RUN_PIPE                "--fifo"
-#define EXTCAP_ARGUMENT_CONTROL_IN              "--extcap-control-in"
-#define EXTCAP_ARGUMENT_CONTROL_OUT             "--extcap-control-out"
-*/
+#include "../include/main.h"
 
 int main (int argc, char **argv)
 {
-    struct option options[5];
+    struct option options[64];
+    int32_t interface = -1;
+    struct _interface_parameters interface_parameters[8]={};
 
-    options[0].long_name  = "help";
-    options[0].short_name = 'h';
-    options[0].flags      = GOPT_ARGUMENT_OPTIONAL; //GOPT_ARGUMENT_FORBIDDEN;
+    options[EXTCAP_INTERFACES].long_name  = "extcap-interfaces";
+    options[EXTCAP_INTERFACES].short_name = '0';
+    options[EXTCAP_INTERFACES].flags      = GOPT_ARGUMENT_FORBIDDEN;
 
-    options[1].long_name  = "version";
-    options[1].short_name = 'V';
-    options[1].flags      = GOPT_ARGUMENT_OPTIONAL; //GOPT_ARGUMENT_FORBIDDEN;
+    options[EXTCAP_INTERFACE].long_name  = "extcap-interface";
+    options[EXTCAP_INTERFACE].short_name = '1';
+    options[EXTCAP_INTERFACE].flags      = GOPT_ARGUMENT_REQUIRED;
 
-    options[2].long_name  = "verbose";
-    options[2].short_name = 'v';
-    options[2].flags      = GOPT_ARGUMENT_REQUIRED; //GOPT_ARGUMENT_FORBIDDEN;
+    options[EXTCAP_VERSION].long_name  = "extcap-version";
+    options[EXTCAP_VERSION].short_name = '2';
+    options[EXTCAP_VERSION].flags      = GOPT_ARGUMENT_OPTIONAL;
 
-    options[3].long_name  = "output";
-    options[3].short_name = 'o';
-    options[3].flags      = GOPT_ARGUMENT_REQUIRED;
+    options[EXTCAP_CONFIG].long_name  = "extcap-config";
+    options[EXTCAP_CONFIG].short_name = '3';
+    options[EXTCAP_CONFIG].flags      = GOPT_ARGUMENT_FORBIDDEN;
 
-    options[4].flags      = GOPT_LAST;
+    options[EXTCAP_CAPTURE_FILTER].long_name  = "extcap-capture-filter";
+    options[EXTCAP_CAPTURE_FILTER].short_name = '4';
+    options[EXTCAP_CAPTURE_FILTER].flags      = GOPT_ARGUMENT_OPTIONAL;
+
+    options[FIFO].long_name  = "fifo";
+    options[FIFO].short_name = '5';
+    options[FIFO].flags      = GOPT_ARGUMENT_REQUIRED;
+
+    options[EXTCAP_CONTROL_IN].long_name  = "extcap-control-in";
+    options[EXTCAP_CONTROL_IN].short_name = '6';
+    options[EXTCAP_CONTROL_IN].flags      = GOPT_ARGUMENT_REQUIRED;
+
+    options[EXTCAP_CONTROL_OUT].long_name  = "extcap-control-out";
+    options[EXTCAP_CONTROL_OUT].short_name = '7';
+    options[EXTCAP_CONTROL_OUT].flags      = GOPT_ARGUMENT_REQUIRED;
+
+    options[EXTCAP_RELOAD_OPTION].long_name  = "extcap-reload-option";
+    options[EXTCAP_RELOAD_OPTION].short_name = '8';
+    options[EXTCAP_RELOAD_OPTION].flags      = GOPT_ARGUMENT_FORBIDDEN;
+
+    options[EXTCAP_DLTS].long_name  = "extcap-dlsts";
+    options[EXTCAP_DLTS].short_name = '9';
+    options[EXTCAP_DLTS].flags      = GOPT_ARGUMENT_FORBIDDEN;
+
+    options[PARAMETER_BITRATE].long_name  = "bitrate";
+    options[PARAMETER_BITRATE].short_name = 'A';
+    options[PARAMETER_BITRATE].flags      = GOPT_ARGUMENT_REQUIRED;
+
+    options[PARAMETER_SILENT].long_name  = "silent";
+    options[PARAMETER_SILENT].short_name = 'B';
+    options[PARAMETER_SILENT].flags      = GOPT_ARGUMENT_REQUIRED;
+
+    options[PARAMETER_LOOPBACK].long_name  = "loopback";
+    options[PARAMETER_LOOPBACK].short_name = 'C';
+    options[PARAMETER_LOOPBACK].flags      = GOPT_ARGUMENT_REQUIRED;
+
+    options[LOG_LEVEL].long_name  = "log-level";
+    options[LOG_LEVEL].short_name = 'D';
+    options[LOG_LEVEL].flags      = GOPT_ARGUMENT_REQUIRED;
+
+    options[LOG_FILE].long_name  = "log-file";
+    options[LOG_FILE].short_name = 'E';
+    options[LOG_FILE].flags      = GOPT_ARGUMENT_REQUIRED;
+
+    options[CAPTURE].long_name  = "capture";
+    options[CAPTURE].short_name = 'F';
+    options[CAPTURE].flags      = GOPT_ARGUMENT_FORBIDDEN;
+
+    options[GOPT_LAST_OPT].flags = GOPT_LAST;
 
     argc = gopt (argv, options);
     gopt_errors (argv[0], options);
 
-    FILE *fout;
-    int   i;
-
-    if (options[0].count)
+    // extcap-interfaces
+    if (options[EXTCAP_INTERFACES].count)
     {
-        fprintf (stdout, "see the manual\n");
-        fprintf (stdout, "option_count=%d\n",options[0].count); //GS
-        fprintf (stdout, "option_argument=%s\n",options[0].argument); //GS
-        //exit (EXIT_SUCCESS);
+        printf("extcap {version=1.0}{help=https://www.rusoku.org}{display=RUSOKU CAN USB adapter extcap interface}\n");
+        printf("interface {value=0}{display=Toucan CAN adapter interface - (VIRTUAL DEMO RANDOM PACKETS)}\n");
+        exit (EXIT_SUCCESS);
     }
 
-    if (options[1].count)
+    // extcap-interface
+    if (options[EXTCAP_INTERFACE].count)
     {
-        fprintf (stdout, "version 1.0\n");
-        fprintf (stdout, "option_count=%d\n",options[1].count); //GS
-        fprintf (stdout, "option_argument=%s\n",options[1].argument); //GS
-        //exit (EXIT_SUCCESS);
+        interface = (int32_t)strtoll(options[1].argument, NULL, 16);
     }
 
-//***********************************************************************
-/*
-    struct option
+    //extcap-version
+    if (options[EXTCAP_VERSION].count)
     {
-        char          short_name;
-        const char   *long_name;
-        unsigned int  flags;
-        unsigned int  count;
-        char         *argument;
-    };
-*/
-    if (options[2].count >= 1)
-    {
-        fputs ("being verbose\n",stdout /*stderr*/);
-        fprintf (stdout, "option_count=%d\n",options[2].count); //GS
-        fprintf (stdout, "option_argument=%s\n",options[2].argument); //GS
+        printf("extcap {version=0.1.0}{help=file:///Applications/Wireshark.app/Contents/Resources/share/wireshark/rusoku-wireshark-plugin.html}\n");
+        exit (EXIT_SUCCESS);
     }
 
-    if (options[2].count >= 2)
+    // extcap-config
+    if (options[EXTCAP_CONFIG].count)
     {
-        fputs ("being very verbose\n", stdout /*stderr*/);
-        fprintf (stdout, "option_count=%d\n",options[2].count); //GS
+        if ( interface < 0 || interface > 7) {
+            exit (EXIT_FAILURE);
+        }
+		printf("arg {number=0}{call=--parameter_bitrate}{display=Bitrate, kbps}{tooltip=Capture bitrate}{type=integer}{range=10,1000}{required=true}{default=125}\n");
+		printf("arg {number=1}{call=--parameter_silent}{display=Silent}{tooltip=enable silent mode}{type=boolflag}\n");
+		printf("arg {number=2}{call=--parameter_loopback}{display=Loopback}{tooltip=enable loopback mode}{type=boolflag}\n");
+        exit (EXIT_SUCCESS);
     }
 
-//***********************************************************************
-
-    if (options[3].count)
+    // extcap-dlts
+    if (options[EXTCAP_DLTS].count)
     {
-        //fout = fopen (options[3].argument, "w");
+        if ( interface < 0 || interface > 7) {
+            exit (EXIT_FAILURE);
+        }
 
-        //if (!fout)
-        //{
-        fprintf (stdout, "option_count=%d\n",options[3].count); //GS
-        fprintf (stdout, "option_argument=%s\n",options[3].argument); //GS
-            //perror (options[3].argument);
-            //exit (EXIT_FAILURE);
-        //}
-    }
-    else
-    {
-        fout = stdout;
+        if (interface == 0) {
+            printf("dlt {number=147}{name=USER0}{display=Demo Implementation for Extcap}");
+        }
+        else {
+            printf("dlt {number=148}{name=USER1}{display=Demo Implementation for Extcap}");
+        }
+        exit (EXIT_SUCCESS);
     }
 
-/*
-    for (i = 0; i < argc; i++)
+    //extcap-bitrate
+    if (options[PARAMETER_BITRATE].count)
     {
-        fputs (argv[i], fout);
-        fputs ("\n",    fout);
+        if (interface < 0 || interface > 7) {
+            exit (EXIT_FAILURE);
+        }
+        interface_parameters[interface].bitrate = (int32_t)strtoll(options[10].argument, NULL, 16);
+        exit (EXIT_SUCCESS);
     }
-*/
+
+    //extcap-silent
+    if (options[PARAMETER_SILENT].count)
+    {
+        if (interface < 0 || interface > 7) {
+            exit (EXIT_FAILURE);
+        }
+        interface_parameters[interface].silent = (int32_t)strtoll(options[11].argument, NULL, 16);
+        exit (EXIT_SUCCESS);
+    }
+
+    //extcap-loopback
+    if (options[PARAMETER_LOOPBACK].count)
+    {
+        if (interface < 0 || interface > 7) {
+            exit (EXIT_FAILURE);
+        }
+        interface_parameters[interface].loopback = (int32_t)strtoll(options[12].argument, NULL, 16);
+        exit (EXIT_SUCCESS);
+    }
 
     return 0;
 }
