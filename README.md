@@ -4,4 +4,4 @@
 #### DLTS:
 - 113 DLT_LINUX_SLL
 
-Adapters lives here: <https://www.rusoku.com/products>
+RUSOKU CAN USB adapters lives here: <https://www.rusoku.com/products>
