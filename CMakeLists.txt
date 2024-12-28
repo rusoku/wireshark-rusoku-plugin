@@ -3,8 +3,7 @@ project(wireshark_rusoku_extcap C)
 
 set(CMAKE_C_STANDARD 11)
 set(PROJECT_NAME rusoku-wirechark-plugin )
-
-set(RPATH "/usr/local/lib")
+#set(RPATH "/usr/local/lib")
 #list(APPEND CMAKE_BUILD_RPATH ${RPATH})
 
 # List all source files
@@ -20,7 +19,7 @@ set(SOURCES
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
-set_target_properties(${PROJECT_NAME}
-       PROPERTIES
-       LINK_FLAGS "-Wl,-rpath,${RPATH}"
-)
+#set_target_properties(${PROJECT_NAME}
+#       PROPERTIES
+#       LINK_FLAGS "-Wl,-rpath,${RPATH} -lpthread"
+#)
