@@ -4,4 +4,4 @@
 #### DLTS:
 - 113 DLT_LINUX_SLL
 
-Adapters lives there: <https://www.rusoku.com/products>
+Adapters lives here: <https://www.rusoku.com/products>
