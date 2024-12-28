@@ -5,6 +5,9 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+#include "pcap_headers.h"
+#include "control_packet_headers.h"
+
 #define EXTCAP_INTERFACES       0
 #define EXTCAP_INTERFACE        1
 #define EXTCAP_VERSION          2

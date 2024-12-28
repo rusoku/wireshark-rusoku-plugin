@@ -144,15 +144,16 @@ int main(int argc, char **argv)
 	argc = gopt(argv, options);
 	gopt_errors(argv[0], options);
 	get_can_interfaces();
+
 	if (options[0].count) {
 		if (options[6].count) {
 			printf("extcap {version=1.0}{help=www.8devices.com}\n");
 		}
 		struct node *ptr = head;
-		while (ptr != NULL) {
-			printf("interface {value=%X}{display=USB2CAN interface - s/n %X}\n", (unsigned int)ptr->data, (unsigned int)ptr->data);
-			ptr = ptr->next;
-		}
+			while (ptr != NULL) {
+				printf("interface {value=%X}{display=USB2CAN interface - s/n %X}\n", (unsigned int)ptr->data, (unsigned int)ptr->data);
+				ptr = ptr->next;
+			}
 		printf("control {number=0}{type=string}{display=Msg ID}{tooltip=Custom frame message ID (0xNNNNNNNN)}{validation=^(([01][a-fA-F0-9]\{0,7\})|([a-fA-F0-9]\{0,7\}))$}\n");
 		printf("control {number=1}{type=boolean}{display=Extended}{tooltip=Extended CAN frame}{default=true}\n");
 		printf("control {number=2}{type=boolean}{display=RTR}{tooltip=Request to Re-transmit}{default=false}\n");

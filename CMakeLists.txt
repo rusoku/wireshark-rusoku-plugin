@@ -15,6 +15,8 @@ set(SOURCES
         include/gopt.h
         src/main.c
         include/main.h
+        include/pcap_headers.h
+        include/control_packet_headers.h
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

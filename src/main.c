@@ -6,17 +6,31 @@
 
 /* <http:///www.purposeful.co.uk/software/gopt> */
 
+//https://ask.wireshark.org/question/29329/extcap-how-to-use-messages-control-protocol/
+
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
+//#include <string.h>
+#include <unistd.h>
 #include "../include/gopt.h"
 #include "../include/main.h"
+
+#include <_time.h>
+
+#define _DEBUG_LOCAL
 
 int main (int argc, char **argv)
 {
     struct option options[64];
     int32_t interface = -1;
-    struct _interface_parameters interface_parameters[8]={};
+    struct _interface_parameters interface_parameters[8] = {};
+
+    //struct _pcap_file_header    pcap_file_hdr = {};
+    //struct _pcap_packet_header  pcap_packet_hdr = {};
+    //struct _sll_packet_header  sll_packet_hdr = {};
+    //printf("PCAP file header=%ld\n", sizeof(pcap_file_hdr));
+    //printf("PCAP packet header=%ld\n", sizeof(pcap_packet_hdr));
+    //printf("SLL packet header=%ld\n", sizeof(sll_packet_hdr));
 
     options[EXTCAP_INTERFACES].long_name  = "extcap-interfaces";
     options[EXTCAP_INTERFACES].short_name = '0';
@@ -54,7 +68,7 @@ int main (int argc, char **argv)
     options[EXTCAP_RELOAD_OPTION].short_name = '8';
     options[EXTCAP_RELOAD_OPTION].flags      = GOPT_ARGUMENT_FORBIDDEN;
 
-    options[EXTCAP_DLTS].long_name  = "extcap-dlsts";
+    options[EXTCAP_DLTS].long_name  = "extcap-dlts";
     options[EXTCAP_DLTS].short_name = '9';
     options[EXTCAP_DLTS].flags      = GOPT_ARGUMENT_FORBIDDEN;
 
@@ -84,87 +98,174 @@ int main (int argc, char **argv)
 
     options[GOPT_LAST_OPT].flags = GOPT_LAST;
 
+#ifdef _DEBUG_LOCAL
+    //------------- DEBUG --------------
+
+    FILE *fout;
+    fout = fopen ("a.log", "a");
+    //for (int i = 1; i < argc; i++)
+    //{
+   //     fputs (argv[i], fout);
+   //     fputs (" ",    fout);
+   //}
+   // fputs ("\n",fout);
+    //fflush (fout);
+    //fclose (fout);
+
+    //--------------------------------------
+#endif
+
     argc = gopt (argv, options);
-    gopt_errors (argv[0], options);
+    //gopt_errors (argv[0], options);
+
+    //if (argc == 1) {
+    //    printf("Usage: %s <--extcap-interfaces | --extcap-dlts | --extcap-interface | --extcap-config | --capture | --extcap-capture-filter | --fifo>\n",argv[0]);
+    //    exit (EXIT_SUCCESS);
+    //}
 
     // extcap-interfaces
     if (options[EXTCAP_INTERFACES].count)
     {
+        fprintf(fout," EXTCAP_INTERFACES ");
+
         printf("extcap {version=1.0}{help=https://www.rusoku.org}{display=RUSOKU CAN USB adapter extcap interface}\n");
-        printf("interface {value=0}{display=Toucan CAN adapter interface - (VIRTUAL DEMO RANDOM PACKETS)}\n");
-        exit (EXIT_SUCCESS);
+        printf("interface {value=0}{display=Toucan CAN adapter interface 0 - (VIRTUAL DEMO RANDOM PACKETS)}\n");
+        printf("interface {value=1}{display=Toucan CAN adapter interface 1 - (VIRTUAL DEMO RANDOM PACKETS)}\n");
+        printf("interface {value=2}{display=Toucan CAN adapter interface 2 - (VIRTUAL DEMO RANDOM PACKETS)}\n");
+        printf("interface {value=3}{display=Toucan CAN adapter interface 3 - (VIRTUAL DEMO RANDOM PACKETS)}\n");
+        printf("interface {value=4}{display=Toucan CAN adapter interface 4 - (VIRTUAL DEMO RANDOM PACKETS)}\n");
+        printf("interface {value=5}{display=Toucan CAN adapter interface 5 - (VIRTUAL DEMO RANDOM PACKETS)}\n");
+        printf("interface {value=6}{display=Toucan CAN adapter interface 6 - (VIRTUAL DEMO RANDOM PACKETS)}\n");
+        printf("interface {value=7}{display=Toucan CAN adapter interface 7 - (VIRTUAL DEMO RANDOM PACKETS)}\n");
+
+        //printf("control {number=0}{type=string}{display=Msg ID}{tooltip=Custom frame message ID (0xNNNNNNNN)}{validation=^(([01][a-fA-F0-9]\\{0,7\\})|([a-fA-F0-9]\\{0,7\\}))$}\n");
+        //printf("control {number=1}{type=boolean}{display=Extended}{tooltip=Extended CAN frame}{default=true}\n");
+        //printf("control {number=2}{type=boolean}{display=RTR}{tooltip=Request to Re-transmit}{default=false}\n");
+        //printf("control {number=3}{type=string}{display=Message}{tooltip=Custom message (0-8 bytes, space separated)}{validation=^([a-fA-F0-9]\\{0,2\\}(\\s)*)\\{0,8\\}$}\n");
+        //printf("control {number=4}{type=button}{display=Send}{tooltip=Send custom frame if values provided. If empty, sends a random frame}\n");
+
+        //printf("value {control=4}{value=1}{display=1 sec}");
+        //printf("value {control=4}{value=2}{display=2 sec}{default=true}");
+
+        //exit (EXIT_SUCCESS);
     }
 
     // extcap-interface
     if (options[EXTCAP_INTERFACE].count)
     {
-        interface = (int32_t)strtoll(options[1].argument, NULL, 16);
+        fprintf(fout," EXTCAP_INTERFACE ");
+
+        interface = (int32_t)strtoll(options[EXTCAP_INTERFACE].argument, NULL, 16);
+
+        //fputs (options[EXTCAP_INTERFACE].argument,fout);
+        //fprintf(fout," EXTCAP_INTERFACE=%s ", options[EXTCAP_INTERFACE].argument);
+        //fflush(fout);
     }
 
     //extcap-version
     if (options[EXTCAP_VERSION].count)
     {
-        printf("extcap {version=0.1.0}{help=file:///Applications/Wireshark.app/Contents/Resources/share/wireshark/rusoku-wireshark-plugin.html}\n");
-        exit (EXIT_SUCCESS);
+        fprintf(fout," EXTCAP_VERSION ");
+
+        printf("extcap {version=4.4}{help=file:///Applications/Wireshark.app/Contents/Resources/share/wireshark/rusoku-wireshark-plugin.html}\n");
+        //exit (EXIT_SUCCESS);
     }
 
     // extcap-config
     if (options[EXTCAP_CONFIG].count)
     {
-        if ( interface < 0 || interface > 7) {
-            exit (EXIT_FAILURE);
-        }
-		printf("arg {number=0}{call=--parameter_bitrate}{display=Bitrate, kbps}{tooltip=Capture bitrate}{type=integer}{range=10,1000}{required=true}{default=125}\n");
-		printf("arg {number=1}{call=--parameter_silent}{display=Silent}{tooltip=enable silent mode}{type=boolflag}\n");
-		printf("arg {number=2}{call=--parameter_loopback}{display=Loopback}{tooltip=enable loopback mode}{type=boolflag}\n");
-        exit (EXIT_SUCCESS);
+        fprintf(fout," EXTCAP_CONFIG ");
+
+     //   if ( interface < 0 || interface > 7) {
+     //       exit (EXIT_FAILURE);
+     //   }
+
+		//printf("arg {number=0}{call=--parameter_bitrate}{display=Bitrate, kbps}{tooltip=Capture bitrate}{type=integer}{range=10,1000}{required=true}{default=125}\n");
+		//printf("arg {number=1}{call=--parameter_silent}{display=Silent}{tooltip=enable silent mode}{type=boolflag}\n");
+		//printf("arg {number=2}{call=--parameter_loopback}{display=Loopback}{tooltip=enable loopback mode}{type=boolflag}\n");
+        //exit (EXIT_SUCCESS);
     }
 
     // extcap-dlts
     if (options[EXTCAP_DLTS].count)
     {
-        if ( interface < 0 || interface > 7) {
-            exit (EXIT_FAILURE);
-        }
+        fprintf(fout," EXTCAP_DLTS ");
 
-        if (interface == 0) {
+        //printf("dlt {number=113}{name=DLT_LINUX_SLL}{display=TouCAN}\n");
+
+       //if ( interface < 0 || interface > 7) {
+       //     exit (EXIT_FAILURE);
+       // }
+
+        //if (interface == 0) {
             printf("dlt {number=147}{name=USER0}{display=Demo Implementation for Extcap}");
-        }
-        else {
-            printf("dlt {number=148}{name=USER1}{display=Demo Implementation for Extcap}");
-        }
-        exit (EXIT_SUCCESS);
+        //}
+        //else {
+        //    printf("dlt {number=148}{name=USER1}{display=Demo Implementation for Extcap}");
+        //}
+        //exit (EXIT_SUCCESS);
     }
 
     //extcap-bitrate
     if (options[PARAMETER_BITRATE].count)
     {
-        if (interface < 0 || interface > 7) {
-            exit (EXIT_FAILURE);
-        }
-        interface_parameters[interface].bitrate = (int32_t)strtoll(options[10].argument, NULL, 16);
-        exit (EXIT_SUCCESS);
+        fprintf(fout," PARAMETER_BITRATE ");
+
+        //if (interface < 0 || interface > 7) {
+        //    exit (EXIT_FAILURE);
+        //}
+        interface_parameters[interface].bitrate = (int32_t)strtoll(options[PARAMETER_BITRATE].argument, NULL, 16);
     }
 
     //extcap-silent
     if (options[PARAMETER_SILENT].count)
     {
-        if (interface < 0 || interface > 7) {
-            exit (EXIT_FAILURE);
-        }
-        interface_parameters[interface].silent = (int32_t)strtoll(options[11].argument, NULL, 16);
-        exit (EXIT_SUCCESS);
+        fprintf(fout," PARAMETER_SILENT ");
+
+        //if (interface < 0 || interface > 7) {
+        //    exit (EXIT_FAILURE);
+        //}
+        interface_parameters[interface].silent = (int32_t)strtoll(options[PARAMETER_SILENT].argument, NULL, 16);
     }
 
     //extcap-loopback
     if (options[PARAMETER_LOOPBACK].count)
     {
-        if (interface < 0 || interface > 7) {
-            exit (EXIT_FAILURE);
-        }
-        interface_parameters[interface].loopback = (int32_t)strtoll(options[12].argument, NULL, 16);
-        exit (EXIT_SUCCESS);
+        fprintf(fout," PARAMETER_LOOPBACK ");
+
+       // if (interface < 0 || interface > 7) {
+       //     exit (EXIT_FAILURE);
+       // }
+        interface_parameters[interface].loopback = (int32_t)strtoll(options[PARAMETER_LOOPBACK].argument, NULL, 16);
     }
+
+    //fifo
+    if (options[FIFO].count)
+    {
+        fprintf(fout, "FIFO");
+
+        //if (interface < 0 || interface > 7) {
+        //    exit (EXIT_FAILURE);
+       //}
+    }
+
+    //capture
+    if (options[CAPTURE].count)
+    {
+        fprintf(fout," CAPTURE ");
+
+        //if (interface < 0 || interface > 7) {
+        //    exit (EXIT_FAILURE);
+        //}
+
+        //for (;;) {
+        //    sleep(1000);
+        //};
+    }
+
+    fprintf(fout,"\n");
+    fflush(fout);
+    fclose(fout);
 
     return 0;
 }
