@@ -5,6 +5,8 @@
 #ifndef PCAP_HEADERS_H
 #define PCAP_HEADERS_H
 
+#include "../include/main.h"
+
 #define LINKTYPE_LINUX_SLL 113
 
 struct __attribute__((__packed__)) _pcap_file_header {
