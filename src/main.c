@@ -8,19 +8,25 @@
 
 //https://ask.wireshark.org/question/29329/extcap-how-to-use-messages-control-protocol/
 //https://github.com/openthread/pyspinel/blob/main/extcap_ot.py
+//https://discussions.apple.com/thread/255759797?sortBy=rank
 
 #include "../include/gopt.h"
 #include "../include/main.h"
 
-
-
-#define _DEBUG_LOCAL
+/*
+    ~/Library/Logs for user-oriented info from non-system software
+    /Library/Logs for Mac-ish system-wide event logging
+    /var/log for Unix-ish system-wide event logging
+*/
 
 int main (int argc, char **argv)
 {
     struct option options[17];
     int32_t interface = -1;
     struct _interface_parameters interface_parameters[8] = {};
+
+    char *fifo_name;
+    FILE *fd_fifo;
 
     //struct _pcap_file_header    pcap_file_hdr = {};
     //struct _pcap_packet_header  pcap_packet_hdr = {};
@@ -95,33 +101,13 @@ int main (int argc, char **argv)
 
     options[GOPT_LAST_OPT].flags = GOPT_LAST;
 
-#ifdef _DEBUG_LOCAL
-    //------------- DEBUG --------------
-
-    FILE *fout;
-    fout = fopen ("d://a.log", "a");
-    //for (int i = 1; i < argc; i++)
-    //{
-    //    fputs (argv[i], fout);
-    //    fputs (" ",    fout);
-   //}
-   // fputs ("\n",fout);
-    //fflush (fout);
-    //fclose (fout);
-
-    //--------------------------------------
-#endif
-
     argc = gopt (argv, options);
     //gopt_errors (argv[0], options);
 
     // extcap-interfaces
     if (options[EXTCAP_INTERFACES].count)
     {
-        fprintf(fout," EXTCAP_INTERFACES ");
-
-        //printf("extcap {version=1.0}{help=https://www.rusoku.org}{display=RUSOKU CAN USB adapter extcap interface}\n");
-        printf("extcap {version=0.1}\n");
+        printf("extcap {version=1.0}{help=https://www.rusoku.org}{display=RUSOKU CAN USB adapter extcap interface}\n");
         printf("interface {value=0}{display=Toucan CAN adapter interface 0 - (VIRTUAL DEMO RANDOM PACKETS)}\n");
         printf("interface {value=1}{display=Toucan CAN adapter interface 1 - (VIRTUAL DEMO RANDOM PACKETS)}\n");
         printf("interface {value=2}{display=Toucan CAN adapter interface 2 - (VIRTUAL DEMO RANDOM PACKETS)}\n");
@@ -146,95 +132,83 @@ int main (int argc, char **argv)
     // extcap-interface
     if (options[EXTCAP_INTERFACE].count)
     {
-        fprintf(fout," EXTCAP_INTERFACE = %s ",options[EXTCAP_INTERFACE].argument);
         interface = (int32_t)strtoll(options[EXTCAP_INTERFACE].argument, NULL, 16);
     }
 
     //extcap-version
     if (options[EXTCAP_VERSION].count)
     {
-        fprintf(fout," EXTCAP_VERSION ");
-        printf("extcap {version=1.0}{help=file:///Applications/Wireshark.app/Contents/Resources/share/wireshark/rusoku-wireshark-plugin.html}\n");
-        //printf("extcap {version=1.0}{help=https://www.rusoku.org}{display=RUSOKU CAN USB adapter extcap interface}\n");
+        //printf("extcap {version=1.0}{help=file:///Applications/Wireshark.app/Contents/Resources/share/wireshark/rusoku-wireshark-plugin.html}\n");
+        printf("extcap {version=1.0}{help=https://www.rusoku.org}{display=RUSOKU CAN USB adapter extcap interface}\n");
     }
 
     // extcap-config
     if (options[EXTCAP_CONFIG].count)
     {
-        fprintf(fout," EXTCAP_CONFIG ");
-        //fprintf(fout," IFACE = %s ",options[EXTCAP_INTERFACE].argument);
-
-     //   if ( interface < 0 || interface > 7) {
-     //       exit (EXIT_FAILURE);
-     //   }
-		//printf("arg {number=0}{call=--parameter_bitrate}{display=Bitrate, kbps}{tooltip=Capture bitrate}{type=integer}{range=10,1000}{required=true}{default=125}\n");
-		//printf("arg {number=1}{call=--parameter_silent}{display=Silent}{tooltip=enable silent mode}{type=boolflag}\n");
-		//printf("arg {number=2}{call=--parameter_loopback}{display=Loopback}{tooltip=enable loopback mode}{type=boolflag}\n");
+        if ( interface < 0 || interface > 7) {
+            exit (EXIT_FAILURE);
+        }
+		printf("arg {number=0}{call=--parameter_bitrate}{display=Bitrate, kbps}{tooltip=Capture bitrate}{type=integer}{range=10,1000}{required=true}{default=125}\n");
+		printf("arg {number=1}{call=--parameter_silent}{display=Silent}{tooltip=enable silent mode}{type=boolflag}{required=true}{default=false}\n");
+		printf("arg {number=2}{call=--parameter_loopback}{display=Loopback}{tooltip=enable loopback mode}{type=boolflag}{required=true}{default=false}\n");
     }
 
     // extcap-dlts
     if (options[EXTCAP_DLTS].count)
     {
-        fprintf(fout," EXTCAP_DLTS ");
-
-        //printf("dlt {number=113}{name=DLT_LINUX_SLL}{display=TouCAN}\n");
-        printf("dlt {number=147}{name=USER0}{display=Demo Implementation for Extcap}\n");
+        printf("dlt {number=113}{name=DLT_LINUX_SLL}{display=TouCAN}\n");
+        //printf("dlt {number=147}{name=USER0}{display=Demo Implementation for Extcap}\n");
     }
 
     //extcap-bitrate
     if (options[PARAMETER_BITRATE].count)
     {
-        fprintf(fout," PARAMETER_BITRATE ");
-
-        //if (interface < 0 || interface > 7) {
-        //    exit (EXIT_FAILURE);
-        //}
+        if (interface < 0 || interface > 7) {
+            exit (EXIT_FAILURE);
+        }
         interface_parameters[interface].bitrate = (int32_t)strtoll(options[PARAMETER_BITRATE].argument, NULL, 16);
     }
 
     //extcap-silent
     if (options[PARAMETER_SILENT].count)
     {
-        fprintf(fout," PARAMETER_SILENT ");
-
-        //if (interface < 0 || interface > 7) {
-        //    exit (EXIT_FAILURE);
-        //}
+        if (interface < 0 || interface > 7) {
+            exit (EXIT_FAILURE);
+        }
         interface_parameters[interface].silent = (int32_t)strtoll(options[PARAMETER_SILENT].argument, NULL, 16);
     }
 
     //extcap-loopback
     if (options[PARAMETER_LOOPBACK].count)
     {
-        fprintf(fout," PARAMETER_LOOPBACK ");
-
-       // if (interface < 0 || interface > 7) {
-       //     exit (EXIT_FAILURE);
-       // }
+        if (interface < 0 || interface > 7) {
+            exit (EXIT_FAILURE);
+        }
         interface_parameters[interface].loopback = (int32_t)strtoll(options[PARAMETER_LOOPBACK].argument, NULL, 16);
     }
 
     //fifo
     if (options[FIFO].count)
     {
-        fprintf(fout, " FIFO");
-        fprintf(fout, "-%s", options[FIFO].argument );
-
-        //if (interface < 0 || interface > 7) {
-        //    exit (EXIT_FAILURE);
-       //}
+        if (interface < 0 || interface > 7) {
+            exit (EXIT_FAILURE);
+       }
+        fifo_name = options[FIFO].argument;
     }
 
     //capture
     if (options[CAPTURE].count)
     {
-        fprintf(fout," CAPTURE ");
-        usleep(1000);
+        if (interface < 0 || interface > 7) {
+            exit (EXIT_FAILURE);
+        }
+
+        fd_fifo = fopen(fifo_name, "wb");
+
+        while (1)
+        {
+            usleep(1000);
+        }
     }
-
-    fprintf(fout,"\n");
-    //fflush(fout);
-    //fclose(fout);
-
     return (EXIT_SUCCESS);
 }
