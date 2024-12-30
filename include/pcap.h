@@ -25,8 +25,18 @@
 #define CAN_MAX_DLEN			8
 #define CAN_MAX_DLEN			8
 
+#ifdef __GNUC__
+#define PACK__
+#define __PACK __attribute__((__packed__))
+#endif
+#ifdef _MSC_VER
+#define PACK__ __pragma( pack(push, 1) )
+#define __PACK __pragma( pack(pop))
+#endif
+
 // A File Header has the following format.
-struct __attribute__((__packed__)) PCAP_FILE_HEADER {
+PACK__ struct PCAP_FILE_HEADER {
+//#endif
     uint32_t magic;    //0xA1B2C3D4
     uint16_t version_major; //2
     uint16_t version_minor; //4
@@ -34,39 +44,32 @@ struct __attribute__((__packed__)) PCAP_FILE_HEADER {
     uint32_t sigfigs;  // Reserved2.SHOULD be filled with 0
     uint32_t snaplen;
     uint32_t linktype;
-};
+}__PACK;
 
 // A Packet Record is the standard container for storing the packets coming from the network.
-struct __attribute__((__packed__)) PCAP_PACKET_RECORD_HEADER{
+PACK__ struct PCAP_PACKET_RECORD_HEADER{
     uint32_t sec;
     uint32_t usec;
     uint32_t caplen;
     uint32_t len;
-};
+}__PACK;
 
-struct __attribute__((__packed__)) PCAP_LINKTYPE_LINUX_SLL_HEADER {
+PACK__ struct PCAP_LINKTYPE_LINUX_SLL_HEADER {
     uint16_t sll_pkttype;					/* packet type */
     uint16_t sll_hatype;					/* link-layer address type */
     uint16_t sll_halen;						/* link-layer address length */
     uint8_t  sll_addr[SLL_ADDRLEN];			/* link-layer address */
     uint16_t sll_protocol;					/* protocol */
-};
+}__PACK;
 
-struct __attribute__((__packed__)) SOCKETCAN_FRAME_HEADER {
+PACK__ struct SOCKETCAN_FRAME_HEADER {
     uint32_t   can_id;  /* 32 bit CAN_ID + EFF/RTR/ERR flags */
     uint8_t    can_dlc; /* frame payload length in byte (0 .. CAN_MAX_DLEN) */
     uint8_t    __pad;   /* padding */
     uint8_t    __res0;  /* reserved / padding */
     uint8_t    __res1;  /* reserved / padding */
     uint8_t    data[CAN_MAX_DLEN];
-};
-
-// bendras paketas be failo headerio
-//struct pcappkt_can {
-//    struct pcap_pkthdr pcap_header;
-//    struct sll_header  sll_header;
-//    struct can_frame   can_frame;
-//};
+}__PACK;
 
 uint32_t swap_endianness(uint32_t bytes, int bit);
 void init_pcap_file_header(struct PCAP_FILE_HEADER *pcap_global_fh);
