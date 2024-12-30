@@ -55,6 +55,13 @@ void get_timestamp(uint32_t *seconds, uint32_t *msec)
 	*seconds = uint32_t(mktime(&tm));
 	*msec = uint32_t(pTime->wMilliseconds)*1000;
 }
+/*
+struct pcappkt_can {
+	struct pcap_pkthdr pcap_header;
+	struct sll_header  sll_header;
+	struct can_frame   can_frame;
+};
+*/
 
 pcap_pkthdr init_pcap_pkt_header(structCanalMsg *canal_frame, pcappkt_can *pcap_frame)
 {
@@ -226,7 +233,7 @@ int capture_can_pcap(uint32_t current_interface, uint32_t flags, int baudrate)
 			threads_started = 1;
 		}
 	}
-	HANDLE signal_pipe = open_signal_pipe(); // ???????????? WTF ??
+	HANDLE signal_pipe = open_signal_pipe();
 
 	//printf("canhandle %X", canal_handle);
 	if (error == 0) printf("could not write header to pipe");

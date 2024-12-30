@@ -23,7 +23,6 @@ struct pcap_pkthdr {
 	uint32_t len;
 };
 
-
 #define PCAP_PKT_LEN			32
 #define SLL_HDR_LEN				16
 #define LEN_CAN_FRAME			16	/* total header length */

@@ -9,13 +9,15 @@ set(PROJECT_NAME rusoku-wirechark-plugin )
 # List all source files
 set(SOURCES
         src/gopt.c
-        src/gopt-errors.c
         src/main.c
         include/gopt.h
         src/main.c
         include/main.h
-        include/pcap_headers.h
+        include/pcap.h
         include/control_packet_headers.h
+        src/pcap.c
+        src/capture.c
+        include/capture.h
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

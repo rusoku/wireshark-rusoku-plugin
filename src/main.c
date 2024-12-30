@@ -6,12 +6,18 @@
 
 /* <http:///www.purposeful.co.uk/software/gopt> */
 
-//https://ask.wireshark.org/question/29329/extcap-how-to-use-messages-control-protocol/
-//https://github.com/openthread/pyspinel/blob/main/extcap_ot.py
-//https://discussions.apple.com/thread/255759797?sortBy=rank
+/*
+Links[...]
+https://ask.wireshark.org/question/29329/extcap-how-to-use-messages-control-protocol/
+https://github.com/openthread/pyspinel/blob/main/extcap_ot.py
+https://discussions.apple.com/thread/255759797?sortBy=rank
+https://github.com/secdev
+https://www.ietf.org/archive/id/draft-gharris-opsawg-pcap-00.html#name-packet-record
+*/
 
 #include "../include/gopt.h"
 #include "../include/main.h"
+#include "../include/capture.h"
 
 /*
     ~/Library/Logs for user-oriented info from non-system software
@@ -22,18 +28,13 @@
 int main (int argc, char **argv)
 {
     struct option options[17];
-    int32_t interface = -1;
-    struct _interface_parameters interface_parameters[8] = {};
+    int interface = -1;
+    struct INTERFACE_PARAMETERS interface_parameters[8] = {};
 
     char *fifo_name;
     FILE *fd_fifo;
 
-    //struct _pcap_file_header    pcap_file_hdr = {};
-    //struct _pcap_packet_header  pcap_packet_hdr = {};
-    //struct _sll_packet_header  sll_packet_hdr = {};
-    //printf("PCAP file header=%ld\n", sizeof(pcap_file_hdr));
-    //printf("PCAP packet header=%ld\n", sizeof(pcap_packet_hdr));
-    //printf("SLL packet header=%ld\n", sizeof(sll_packet_hdr));
+    //struct PCAP_FILE_HEADER pcap_file_header = {};
 
     options[EXTCAP_INTERFACES].long_name  = "extcap-interfaces";
     options[EXTCAP_INTERFACES].short_name = '0';
@@ -102,20 +103,20 @@ int main (int argc, char **argv)
     options[GOPT_LAST_OPT].flags = GOPT_LAST;
 
     argc = gopt (argv, options);
-    //gopt_errors (argv[0], options);
 
     // extcap-interfaces
     if (options[EXTCAP_INTERFACES].count)
     {
         printf("extcap {version=1.0}{help=https://www.rusoku.org}{display=RUSOKU CAN USB adapter extcap interface}\n");
         printf("interface {value=0}{display=Toucan CAN adapter interface 0 - (VIRTUAL DEMO RANDOM PACKETS)}\n");
-        printf("interface {value=1}{display=Toucan CAN adapter interface 1 - (VIRTUAL DEMO RANDOM PACKETS)}\n");
-        printf("interface {value=2}{display=Toucan CAN adapter interface 2 - (VIRTUAL DEMO RANDOM PACKETS)}\n");
-        printf("interface {value=3}{display=Toucan CAN adapter interface 3 - (VIRTUAL DEMO RANDOM PACKETS)}\n");
-        printf("interface {value=4}{display=Toucan CAN adapter interface 4 - (VIRTUAL DEMO RANDOM PACKETS)}\n");
-        printf("interface {value=5}{display=Toucan CAN adapter interface 5 - (VIRTUAL DEMO RANDOM PACKETS)}\n");
-        printf("interface {value=6}{display=Toucan CAN adapter interface 6 - (VIRTUAL DEMO RANDOM PACKETS)}\n");
-        printf("interface {value=7}{display=Toucan CAN adapter interface 7 - (VIRTUAL DEMO RANDOM PACKETS)}\n");
+        printf("interface {value=1}{display=Toucan CAN adapter interface 1 - (RUSOKU TouCAN sn: xxxxxxxx )}\n");
+        printf("interface {value=2}{display=Toucan CAN adapter interface 2 - (RUSOKU TouCAN sn: xxxxxxxx )}\n");
+        printf("interface {value=3}{display=Toucan CAN adapter interface 3 - (RUSOKU TouCAN sn: xxxxxxxx )}\n");
+        printf("interface {value=4}{display=Toucan CAN adapter interface 4 - (RUSOKU TouCAN sn: xxxxxxxx )}\n");
+        printf("interface {value=5}{display=Toucan CAN adapter interface 5 - (RUSOKU TouCAN sn: xxxxxxxx )}\n");
+        printf("interface {value=6}{display=Toucan CAN adapter interface 6 - (RUSOKU TouCAN sn: xxxxxxxx )}\n");
+        printf("interface {value=7}{display=Toucan CAN adapter interface 7 - (RUSOKU TouCAN sn: xxxxxxxx )}\n");
+        printf("interface {value=8}{display=Toucan CAN adapter interface 8 - (RUSOKU TouCAN sn: xxxxxxxx )}\n");
 
         //printf("control {number=0}{type=string}{display=Msg ID}{tooltip=Custom frame message ID (0xNNNNNNNN)}{validation=^(([01][a-fA-F0-9]\\{0,7\\})|([a-fA-F0-9]\\{0,7\\}))$}\n");
         //printf("control {number=1}{type=boolean}{display=Extended}{tooltip=Extended CAN frame}{default=true}\n");
@@ -166,7 +167,8 @@ int main (int argc, char **argv)
         if (interface < 0 || interface > 7) {
             exit (EXIT_FAILURE);
         }
-        interface_parameters[interface].bitrate = (int32_t)strtoll(options[PARAMETER_BITRATE].argument, NULL, 16);
+
+        interface_parameters[interface].bitrate |= (int32_t)strtoll(options[PARAMETER_BITRATE].argument, NULL, 16);
     }
 
     //extcap-silent
@@ -175,7 +177,10 @@ int main (int argc, char **argv)
         if (interface < 0 || interface > 7) {
             exit (EXIT_FAILURE);
         }
-        interface_parameters[interface].silent = (int32_t)strtoll(options[PARAMETER_SILENT].argument, NULL, 16);
+
+        if ((int32_t)strtoll(options[PARAMETER_SILENT].argument, NULL, 16)) {
+            interface_parameters[interface].options |= INTERAFACE_PARAMETER_SILENT;
+        }
     }
 
     //extcap-loopback
@@ -184,7 +189,10 @@ int main (int argc, char **argv)
         if (interface < 0 || interface > 7) {
             exit (EXIT_FAILURE);
         }
-        interface_parameters[interface].loopback = (int32_t)strtoll(options[PARAMETER_LOOPBACK].argument, NULL, 16);
+
+        if ((int32_t)strtoll(options[PARAMETER_LOOPBACK].argument, NULL, 16)) {
+            interface_parameters[interface].options |= INTERAFACE_PARAMETER_LOOPBACK;
+        }
     }
 
     //fifo
@@ -203,12 +211,8 @@ int main (int argc, char **argv)
             exit (EXIT_FAILURE);
         }
 
-        fd_fifo = fopen(fifo_name, "wb");
+    capture(fifo_name, interface_parameters);
 
-        while (1)
-        {
-            usleep(1000);
-        }
     }
     return (EXIT_SUCCESS);
 }

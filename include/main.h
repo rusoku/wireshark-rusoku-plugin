@@ -12,7 +12,7 @@
 #include <time.h>
 #include <stdint.h>
 
-#include "pcap_headers.h"
+#include "pcap.h"
 #include "control_packet_headers.h"
 
 #define EXTCAP_INTERFACE        0
@@ -33,11 +33,13 @@
 #define CAPTURE                 15
 #define GOPT_LAST_OPT           16
 
+#define INTERAFACE_PARAMETER_SILENT     1
+#define INTERAFACE_PARAMETER_LOOPBACK   2
 
-struct _interface_parameters{
-    int bitrate;
-    int silent;
-    int loopback;
+struct INTERFACE_PARAMETERS{
+    char        serial[16];
+    uint32_t    bitrate;
+    uint32_t    options;;
 };
 
 #endif //MAIN_H
