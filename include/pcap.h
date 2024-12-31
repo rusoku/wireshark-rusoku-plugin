@@ -36,7 +36,6 @@
 
 // A File Header has the following format.
 PACK__ struct PCAP_FILE_HEADER {
-//#endif
     uint32_t magic;    //0xA1B2C3D4
     uint16_t version_major; //2
     uint16_t version_minor; //4

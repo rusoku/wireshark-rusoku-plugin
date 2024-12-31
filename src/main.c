@@ -28,13 +28,9 @@ https://www.ietf.org/archive/id/draft-gharris-opsawg-pcap-00.html#name-packet-re
 int main (int argc, char **argv)
 {
     struct option options[17];
-    int interface = -1;
+    int16_t interface = -1;
     struct INTERFACE_PARAMETERS interface_parameters[8] = {};
-
     char *fifo_name;
-    FILE *fd_fifo;
-
-    //struct PCAP_FILE_HEADER pcap_file_header = {};
 
     options[EXTCAP_INTERFACES].long_name  = "extcap-interfaces";
     options[EXTCAP_INTERFACES].short_name = '0';
@@ -118,16 +114,14 @@ int main (int argc, char **argv)
         printf("interface {value=7}{display=Toucan CAN adapter interface 7 - (RUSOKU TouCAN sn: xxxxxxxx )}\n");
         printf("interface {value=8}{display=Toucan CAN adapter interface 8 - (RUSOKU TouCAN sn: xxxxxxxx )}\n");
 
-        //printf("control {number=0}{type=string}{display=Msg ID}{tooltip=Custom frame message ID (0xNNNNNNNN)}{validation=^(([01][a-fA-F0-9]\\{0,7\\})|([a-fA-F0-9]\\{0,7\\}))$}\n");
-        //printf("control {number=1}{type=boolean}{display=Extended}{tooltip=Extended CAN frame}{default=true}\n");
-        //printf("control {number=2}{type=boolean}{display=RTR}{tooltip=Request to Re-transmit}{default=false}\n");
-        //printf("control {number=3}{type=string}{display=Message}{tooltip=Custom message (0-8 bytes, space separated)}{validation=^([a-fA-F0-9]\\{0,2\\}(\\s)*)\\{0,8\\}$}\n");
-        //printf("control {number=4}{type=button}{display=Send}{tooltip=Send custom frame if values provided. If empty, sends a random frame}\n");
+//        printf("control {number=0}{type=string}{display=Msg ID}{tooltip=Custom frame message ID (0xNNNNNNNN)}{validation=^(([01][a-fA-F0-9]\\{0,7\\})|([a-fA-F0-9]\\{0,7\\}))$}\n");
+//        printf("control {number=1}{type=boolean}{display=Extended}{tooltip=Extended CAN frame}{default=true}\n");
+//        printf("control {number=2}{type=boolean}{display=RTR}{tooltip=Request to Re-transmit}{default=false}\n");
+//        printf("control {number=3}{type=string}{display=Message}{tooltip=Custom message (0-8 bytes, space separated)}{validation=^([a-fA-F0-9]\\{0,2\\}(\\s)*)\\{0,8\\}$}\n");
+//        printf("control {number=4}{type=button}{display=Send}{tooltip=Send custom frame if values provided. If empty, sends a random frame}\n");
 
-        //printf("value {control=1}{value=1}{display=1 sec}");
-        //printf("value {control=1}{value=2}{display=2 sec}{default=true}");
-
-        //exit (EXIT_SUCCESS);
+        //printf("value {control=1}{value=0}{display=1 sec}");
+        //printf("value {control=1}{value=1}{display=2 sec}{default=true}");
     }
 
     // extcap-interface
@@ -157,8 +151,9 @@ int main (int argc, char **argv)
     // extcap-dlts
     if (options[EXTCAP_DLTS].count)
     {
-        printf("dlt {number=113}{name=DLT_LINUX_SLL}{display=TouCAN}\n");
+        //printf("dlt {number=113}{name=DLT_LINUX_SLL}{display=TouCAN}\n");
         //printf("dlt {number=147}{name=USER0}{display=Demo Implementation for Extcap}\n");
+        printf("dlt {number=227}{name=DLT_CAN_SOCKETCAN}{display=TouCAN}\n");
     }
 
     //extcap-bitrate
@@ -211,7 +206,7 @@ int main (int argc, char **argv)
             exit (EXIT_FAILURE);
         }
 
-    capture(fifo_name, interface_parameters);
+    capture(fifo_name, interface_parameters, interface);
 
     }
     return (EXIT_SUCCESS);

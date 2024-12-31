@@ -6,8 +6,11 @@
 #include "../include/pcap.h"
 #include "../include/capture.h"
 
-void capture(char *fifo_name, struct INTERFACE_PARAMETERS *interface_parameters)
+void capture(char *fifo_name, struct INTERFACE_PARAMETERS *interface_parameters, int16_t interface)
 {
+        if (interface == -1)
+                exit (EXIT_FAILURE);
+
         FILE *fp;
         struct PCAP_FILE_HEADER pcap_file_header = {};
         struct PCAP_PACKET_RECORD_HEADER pcap_packet = {};
