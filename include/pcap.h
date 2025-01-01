@@ -11,10 +11,11 @@
 #define DLT_LINUX_SLL           113
 #define LINKTYPE_LINUX_SLL2     276
 #define DLT_LINUX_SLL2          276
-#define LINKTYPE_CAN_SOCKETCAN  409
-#define DLT_CAN_SOCKETCAN       409
+#define LINKTYPE_CAN_SOCKETCAN  227
+#define DLT_CAN_SOCKETCAN       227
 
-#define PCAP_PKT_LEN			32
+#define PCAP_SLL_PKT_LEN		32
+#define PCAP_SOCKETCAN_PKT_LEN  16
 #define SLL_HDR_LEN				16
 #define LEN_CAN_FRAME			16	/* total header length */
 #define SLL_ADDRLEN				8	/* length of address field */
@@ -36,29 +37,38 @@
 
 // A File Header has the following format.
 PACK__ struct PCAP_FILE_HEADER {
-    uint32_t magic;    //0xA1B2C3D4
-    uint16_t version_major; //2
-    uint16_t version_minor; //4
-    uint32_t thiszone; // Reserved1.SHOULD be filled with 0
-    uint32_t sigfigs;  // Reserved2.SHOULD be filled with 0
-    uint32_t snaplen;
-    uint32_t linktype;
+    uint32_t    magic;    //0xA1B2C3D4
+    uint16_t    version_major; //2
+    uint16_t    version_minor; //4
+    uint32_t    thiszone; // Reserved1.SHOULD be filled with 0
+    uint32_t    sigfigs;  // Reserved2.SHOULD be filled with 0
+    uint32_t    snaplen;
+    uint32_t    linktype;
 }__PACK;
 
 // A Packet Record is the standard container for storing the packets coming from the network.
 PACK__ struct PCAP_PACKET_RECORD_HEADER{
-    uint32_t sec;
-    uint32_t usec;
-    uint32_t caplen;
-    uint32_t len;
+    uint32_t    sec;
+    uint32_t    usec;
+    uint32_t    caplen;
+    uint32_t    len;
 }__PACK;
 
 PACK__ struct PCAP_LINKTYPE_LINUX_SLL_HEADER {
-    uint16_t sll_pkttype;					/* packet type */
-    uint16_t sll_hatype;					/* link-layer address type */
-    uint16_t sll_halen;						/* link-layer address length */
-    uint8_t  sll_addr[SLL_ADDRLEN];			/* link-layer address */
-    uint16_t sll_protocol;					/* protocol */
+    uint16_t    sll_pkttype;					/* packet type */
+    uint16_t    sll_hatype;				        /* link-layer address type */
+    uint16_t    sll_halen;						/* link-layer address length */
+    uint8_t     sll_addr[SLL_ADDRLEN];			/* link-layer address */
+    uint16_t    sll_protocol;					/* protocol */
+}__PACK;
+
+PACK__ struct PCAP_LINKTYPE_CAN_SOCKETCAN {
+    uint32_t    can_id;			        		/* can id */
+    uint8_t     payload_length;;                /* payload length */
+    uint8_t     fd_flags;						/* fd lags */
+    uint8_t     reserved1;			            /* reserved1 */
+    uint8_t     reserved2;  					/* reserved2 */
+    uint8_t     data[CAN_MAX_DLEN];
 }__PACK;
 
 PACK__ struct SOCKETCAN_FRAME_HEADER {
@@ -71,9 +81,10 @@ PACK__ struct SOCKETCAN_FRAME_HEADER {
 }__PACK;
 
 uint32_t swap_endianness(uint32_t bytes, int bit);
-void init_pcap_file_header(struct PCAP_FILE_HEADER *pcap_global_fh);
-struct PCAP_LINKTYPE_LINUX_SLL_HEADER init_sll_header(uint16_t pkttype);
-struct PCAP_PACKET_RECORD_HEADER init_pcap_pkt_header(void);
+void init_pcap_file_header(struct PCAP_FILE_HEADER *pcap_global_fh, uint32_t dlt);
+struct PCAP_LINKTYPE_LINUX_SLL_HEADER init_sll_linktype_header(uint16_t pkttype);
+struct PCAP_LINKTYPE_CAN_SOCKETCAN init_socketcan_linktype_header(void);
+struct PCAP_PACKET_RECORD_HEADER init_pcap_pkt_header(uint32_t pkt_cap_len, uint32_t pkt_len);
 struct SOCKETCAN_FRAME_HEADER init_rnd_fake_can_header(void);
 
 #endif //PCAP_HEADERS_H

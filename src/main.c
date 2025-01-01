@@ -13,6 +13,7 @@ https://github.com/openthread/pyspinel/blob/main/extcap_ot.py
 https://discussions.apple.com/thread/255759797?sortBy=rank
 https://github.com/secdev
 https://www.ietf.org/archive/id/draft-gharris-opsawg-pcap-00.html#name-packet-record
+https://munich.dissec.to/kb/chapters/can/can-socketcan.html
 */
 
 #include "../include/gopt.h"

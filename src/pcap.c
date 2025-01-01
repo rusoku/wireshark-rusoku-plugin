@@ -3,14 +3,31 @@
 //
 
 #include "../include/pcap.h"
+#include <math.h>
+
+/*
+void print_current_time_with_ms (void)
+{
+    long            ms; // Milliseconds
+    time_t          s;  // Seconds
+    struct timespec spec;
+
+    clock_gettime(CLOCK_REALTIME, &spec);
+
+    s  = spec.tv_sec;
+    ms = round(spec.tv_nsec / 1.0e6); // Convert nanoseconds to milliseconds
+    if (ms > 999) {
+        s++;
+        ms = 0;
+    }
+}
+*/
 
 uint16_t randRange(int n)
 {
     uint16_t limit;
     uint16_t r;
-
     limit = RAND_MAX - (RAND_MAX % n);
-
     while((r = rand()) >= limit);
     return r % n;
 }
@@ -27,45 +44,75 @@ uint32_t swap_endianness(uint32_t bytes, int bit) {
     return bytes;
 }
 
-void init_pcap_file_header(struct PCAP_FILE_HEADER *pcap_global_fh) {
-    pcap_global_fh->magic = 0xA1B2C3D4;
+void init_pcap_file_header(struct PCAP_FILE_HEADER *pcap_global_fh, uint32_t dlt) {
+    pcap_global_fh->magic = 0xA1B23C4D; //0xA1B2C3D4;
     pcap_global_fh->version_major = 2;
     pcap_global_fh->version_minor = 4;
     pcap_global_fh->thiszone = 0;
     pcap_global_fh->sigfigs = 0;
-    pcap_global_fh->snaplen = 40; // TODO: is buffer correct ?
-    pcap_global_fh->linktype = LINKTYPE_LINUX_SLL; // DLT 113
+    pcap_global_fh->snaplen = 2048; //TODO: is buffer size correct ?
+    pcap_global_fh->linktype = dlt;
 }
 
 //struct PCAP_PACKET_RECORD_HEADER init_pcap_pkt_header(structCanalMsg *canal_frame, pcappkt_can *pcap_frame)
-struct PCAP_PACKET_RECORD_HEADER init_pcap_pkt_header(void)
+struct PCAP_PACKET_RECORD_HEADER init_pcap_pkt_header(uint32_t pkt_cap_len, uint32_t pkt_len)
 {
-    struct PCAP_PACKET_RECORD_HEADER pcap_packet_header;
+    static struct PCAP_PACKET_RECORD_HEADER pcap_packet_header = {};
+    struct timespec spec = {};
 
-    //get_timestamp(&pcap_packet_header.sec, &pcap_packet_header.usec);
-    pcap_packet_header.sec = 0;  // TODO: temporary, fix this
-    pcap_packet_header.usec = 0; // TODO: temporary, fix this
+    clock_gettime(CLOCK_REALTIME, &spec);
 
-    pcap_packet_header.caplen = PCAP_PKT_LEN;
-    pcap_packet_header.len = PCAP_PKT_LEN;
+    pcap_packet_header.sec = spec.tv_sec;
+    pcap_packet_header.usec = spec.tv_nsec; //round(spec.tv_nsec / 1.0e6);
+
+    pcap_packet_header.caplen = pkt_cap_len;
+    pcap_packet_header.len = pkt_len;
     return pcap_packet_header;
 }
 
-
 struct PCAP_LINKTYPE_LINUX_SLL_HEADER init_sll_header(uint16_t pkttype)
 {
-    struct PCAP_LINKTYPE_LINUX_SLL_HEADER sll_header;
+    static struct PCAP_LINKTYPE_LINUX_SLL_HEADER sll_header = {};
     sll_header.sll_pkttype = swap_endianness(pkttype, 16);
     sll_header.sll_hatype = swap_endianness(HATYPE_ARPHRD_NONE, 16);
     sll_header.sll_halen = 0;
-    for (int i = 0; i < SLL_ADDRLEN; i++) sll_header.sll_addr[i] = 0xFF;
+    for (int i = 0; i < SLL_ADDRLEN; i++)
+        sll_header.sll_addr[i] = 0xFF;
     sll_header.sll_protocol = swap_endianness(SLL_PROTOCOL_TYPE_CAN, 16);
     return sll_header;
 }
 
+//PACK__ struct PCAP_LINKTYPE_CAN_SOCKETCAN {
+//    uint32_t can_id_flags;					/* can id */
+//    uint8_t length;          	            /* payload length */
+//    uint8_t fd_flags;						/* fd lags */
+//    uint8_t reserved1;			            /* reserved1 */
+//    uint8_t reserved2;  					/* reserved2 */
+//}__PACK;
+
+struct PCAP_LINKTYPE_CAN_SOCKETCAN init_socketcan_linktype_header(void)
+{
+    static struct PCAP_LINKTYPE_CAN_SOCKETCAN socketcan_frame = {};
+    socketcan_frame.can_id = swap_endianness(0x123, 0); //| swap_endianness(0x80000000, 0);
+    socketcan_frame.payload_length = 8;
+    socketcan_frame.fd_flags =  0;
+    socketcan_frame.reserved1 = 0;
+    socketcan_frame.reserved2 = 0;
+
+    socketcan_frame.data[0] = 0x11;
+    socketcan_frame.data[1] = 0x22;
+    socketcan_frame.data[2] = 0x33;
+    socketcan_frame.data[3] = 0x44;
+    socketcan_frame.data[4] = 0x55;
+    socketcan_frame.data[5] = 0x66;
+    socketcan_frame.data[6] = 0x77;
+    socketcan_frame.data[7] = 0x88;
+    return socketcan_frame;
+}
+
 struct SOCKETCAN_FRAME_HEADER init_rnd_fake_can_header(void)
 {
-    struct SOCKETCAN_FRAME_HEADER can_frame;
+    static struct SOCKETCAN_FRAME_HEADER can_frame = {};
     can_frame.can_id = randRange(1000);
     can_frame.can_dlc = 8;
 
