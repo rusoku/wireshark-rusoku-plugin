@@ -1,6 +1,6 @@
 ### Wireshark extcap plugin for a RUSOKU CAN bus to USB adapters.
 
-![screenshot](images/TouCAN_wireshark_1.jpg)
+![TouCAN_wireshark_1.jpg](Images/TouCAN_wireshark_1.jpg)
 
 #### Supported OS:
 - MACOS Apple silicon arm64
