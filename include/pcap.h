@@ -80,11 +80,19 @@ PACK__ struct SOCKETCAN_FRAME_HEADER {
     uint8_t    data[CAN_MAX_DLEN];
 }__PACK;
 
+struct CAN_FRAME {
+    uint32_t   can_id;
+    uint8_t    can_ext;
+    uint8_t    can_dlc;
+    uint8_t    can_data[8];
+};
+
 uint32_t swap_endianness(uint32_t bytes, int bit);
 void init_pcap_file_header(struct PCAP_FILE_HEADER *pcap_global_fh, uint32_t dlt);
 struct PCAP_LINKTYPE_LINUX_SLL_HEADER init_sll_linktype_header(uint16_t pkttype);
 struct PCAP_LINKTYPE_CAN_SOCKETCAN init_socketcan_linktype_header(void);
 struct PCAP_PACKET_RECORD_HEADER init_pcap_pkt_header(uint32_t pkt_cap_len, uint32_t pkt_len);
 struct SOCKETCAN_FRAME_HEADER init_rnd_fake_can_header(void);
+struct PCAP_LINKTYPE_CAN_SOCKETCAN prepare_socketcan_linktype_from_canframe(struct CAN_FRAME *can_frame);
 
 #endif //PCAP_HEADERS_H

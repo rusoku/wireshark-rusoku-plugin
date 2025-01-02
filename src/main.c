@@ -201,14 +201,14 @@ int main (int argc, char **argv)
     }
 
     //capture
-    if (options[CAPTURE].count)
-    {
+    if (options[CAPTURE].count) {
         if (interface < 0 || interface > 7) {
             exit (EXIT_FAILURE);
         }
 
-    capture(fifo_name, interface_parameters, interface);
-
+        if (interface == 0) {
+            capture_demo(fifo_name, interface_parameters, interface);
+        }
     }
     return (EXIT_SUCCESS);
 }

@@ -70,6 +70,8 @@ struct PCAP_PACKET_RECORD_HEADER init_pcap_pkt_header(uint32_t pkt_cap_len, uint
     return pcap_packet_header;
 }
 
+
+
 struct PCAP_LINKTYPE_LINUX_SLL_HEADER init_sll_header(uint16_t pkttype)
 {
     static struct PCAP_LINKTYPE_LINUX_SLL_HEADER sll_header = {};
@@ -93,20 +95,33 @@ struct PCAP_LINKTYPE_LINUX_SLL_HEADER init_sll_header(uint16_t pkttype)
 struct PCAP_LINKTYPE_CAN_SOCKETCAN init_socketcan_linktype_header(void)
 {
     static struct PCAP_LINKTYPE_CAN_SOCKETCAN socketcan_frame = {};
-    socketcan_frame.can_id = swap_endianness(0x123, 0); //| swap_endianness(0x80000000, 0);
+    socketcan_frame.can_id = swap_endianness(randRange(0x7FF), 0);// | swap_endianness(0x80000000, 0);
     socketcan_frame.payload_length = 8;
     socketcan_frame.fd_flags =  0;
     socketcan_frame.reserved1 = 0;
     socketcan_frame.reserved2 = 0;
 
-    socketcan_frame.data[0] = 0x11;
-    socketcan_frame.data[1] = 0x22;
-    socketcan_frame.data[2] = 0x33;
-    socketcan_frame.data[3] = 0x44;
-    socketcan_frame.data[4] = 0x55;
-    socketcan_frame.data[5] = 0x66;
-    socketcan_frame.data[6] = 0x77;
-    socketcan_frame.data[7] = 0x88;
+    socketcan_frame.data[0] = randRange(255);
+    socketcan_frame.data[1] = randRange(255);
+    socketcan_frame.data[2] = randRange(255);
+    socketcan_frame.data[3] = randRange(255);
+    socketcan_frame.data[4] = randRange(255);
+    socketcan_frame.data[5] = randRange(255);
+    socketcan_frame.data[6] = randRange(255);
+    socketcan_frame.data[7] = randRange(255);
+    return socketcan_frame;
+}
+
+struct PCAP_LINKTYPE_CAN_SOCKETCAN prepare_socketcan_linktype_from_canframe(struct CAN_FRAME *can_frame)
+{
+    static struct PCAP_LINKTYPE_CAN_SOCKETCAN socketcan_frame = {};
+    if (can_frame->can_ext) {
+        socketcan_frame.can_id = swap_endianness(can_frame->can_id, 0) | swap_endianness(0x80000000, 0);
+    } else {
+        socketcan_frame.can_id = swap_endianness(can_frame->can_id, 0);
+    }
+    socketcan_frame.payload_length = can_frame->can_dlc;
+    memcpy((void *)&socketcan_frame.data[0], (void*)&can_frame->can_data[0], 8);
     return socketcan_frame;
 }
 
