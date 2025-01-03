@@ -70,8 +70,6 @@ struct PCAP_PACKET_RECORD_HEADER init_pcap_pkt_header(uint32_t pkt_cap_len, uint
     return pcap_packet_header;
 }
 
-
-
 struct PCAP_LINKTYPE_LINUX_SLL_HEADER init_sll_header(uint16_t pkttype)
 {
     static struct PCAP_LINKTYPE_LINUX_SLL_HEADER sll_header = {};

@@ -16,7 +16,7 @@
 #define CTRL_CMD_WARNING	 8
 #define CTRL_CMD_ERROR		 9
 
-struct __attribute__((__packed__)) _control_packet_headers {
+struct _control_packet_headers {
     uint8_t	   sync;
     uint8_t    len[3];
     uint8_t    ctrlNum;
