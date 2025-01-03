@@ -13,20 +13,6 @@ void capture_demo(char *fifo_name, struct INTERFACE_PARAMETERS *interface_parame
         if (interface == -1)
                 exit (EXIT_FAILURE);
 
-/*
-        0.010sec 7E8 10 2D 62 E0 01 9F F7 FE ---> First Frame for Multi Frame. 45 Bytes(2D) datas contained in '62 E0 01' response
-        0.020sec 7E8 21 00 00 AA 00 00 00 00 ---> Consecutive Frame for First datas in '62 E0 01' response
-        0.030sec 7E8 22 00 00 00 00 00 00 00 ---> Consecutive Frame for Second datas in '62 E0 01' response
-        0.040sec 7E8 23 00 00 00 00 00 00 00 ---> Consecutive Frame for Third datas in '62 E0 01' response
-        0.050sec 7E8 24 ~~~~~~ ---> Consecutive Frame for Fourth datas in '62 E0 01' response
-        ~~~~
-        0.080sec 7E8 10 1A 62 E0 04 FF FF 07 ---> First Frame for Multi Frame. 26 Bytes(1A) datas contained in '62 E0 04' response
-        0.090sec 7E8 21 00 00 00 00 00 00 00 ---> Consecutive Frame for First datas in '62 E0 04' response
-        ~~~~
-        0.210sec 7E8 10 2D 62 E0 01 9F F7 FE
-        0.220sec 7E8 21 00 00 AE 00 00 00 00
-  */
-
         struct CAN_FRAME can_frame[] = {
         {0x7E8, 0, 8, 0x10, 0x2D, 0x62, 0xE0, 0x01, 0x9F, 0xF7, 0xFE},
         {0x7E8, 0, 8, 0x21, 0x00, 0x00, 0xAA, 0x00, 0x00, 0x00, 0x00},
