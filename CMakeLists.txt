@@ -23,11 +23,20 @@ set(SOURCES
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} -lpthread -ldl )
 
-#list(APPEND CMAKE_BUILD_RPATH ${RPATH})
-set(RPATH /usr/local/lib)
-set_target_properties(${PROJECT_NAME}
-       PROPERTIES
-       LINK_FLAGS "-Wl,-rpath ${RPATH}"
-)
+if(WIN32)
+    message("OS:win32")
+    target_link_libraries(${PROJECT_NAME} -lpthread -ldl )
+elseif(APPLE)
+    message("OS:apple")
+    target_link_libraries(${PROJECT_NAME} -lpthread)
+    list(APPEND CMAKE_BUILD_RPATH ${RPATH})
+    set(RPATH /usr/local/lib)
+    set_target_properties(${PROJECT_NAME}
+            PROPERTIES
+            LINK_FLAGS "-Wl,-rpath ${RPATH}"
+    )
+elseif(UNIX)
+    message("OS:unix")
+endif()
+

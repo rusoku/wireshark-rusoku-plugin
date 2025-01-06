@@ -2,6 +2,5 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-release-msys_mingw/_deps/dlfcn-win32-src" vcs="Git" />
   </component>
 </project>
