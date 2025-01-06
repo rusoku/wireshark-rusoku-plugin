@@ -25,10 +25,10 @@ set(SOURCES
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} -lpthread -ldl)
+#target_link_libraries(${PROJECT_NAME} -lpthread -ldl)
 
-set(RPATH "/usr/local/lib")
+set(RPATH /usr/local/lib)
 set_target_properties(${PROJECT_NAME}
        PROPERTIES
-       LINK_FLAGS "-Wl,-rpath,${RPATH} -lpthread"
+       LINK_FLAGS "-Wl,-rpath ${RPATH} -lpthread -ldl"
 )
