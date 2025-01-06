@@ -1,9 +1,9 @@
-cmake_minimum_required(VERSION 3.6.1)
+cmake_minimum_required(VERSION 3.30.5)
 project(wireshark_rusoku_extcap C)
 
-set(CMAKE_C_STANDARD 23)
-set(PROJECT_NAME rusoku-wirechark-plugin )
-#set(RPATH "/usr/local/lib")
+set(CMAKE_C_STANDARD 11)
+set(PROJECT_NAME rusoku-wirechark-plugin)
+
 #list(APPEND CMAKE_BUILD_RPATH ${RPATH})
 
 # List all source files
@@ -18,18 +18,17 @@ set(SOURCES
         src/pcap.c
         src/capture.c
         include/capture.h
+        src/comm_base.c
+        include/comm_base.h
+        src/comm_rusoku.c
+        include/comm_rusoku.h
 )
 
-#find_library(LIBRT rt)
-#if(LIBRT)
-#    target_link_libraries(${PROJECT_NAME} ${LIBRT})
-#endif()
-
 add_executable(${PROJECT_NAME} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} -lpthread)
+target_link_libraries(${PROJECT_NAME} -lpthread -ldl)
 
-#set_target_properties(${PROJECT_NAME}
-#       PROPERTIES
-#       LINK_FLAGS "-Wl,-rpath,${RPATH} -lpthread -lrt"
-#)
-
+set(RPATH "/usr/local/lib")
+set_target_properties(${PROJECT_NAME}
+       PROPERTIES
+       LINK_FLAGS "-Wl,-rpath,${RPATH} -lpthread"
+)

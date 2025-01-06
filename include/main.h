@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <stdint.h>
+#include <dlfcn.h>
 
 #include "pcap.h"
 #include "control_packet_headers.h"
