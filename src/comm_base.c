@@ -4,16 +4,8 @@
 
 #include "../include/comm_base.h"
 
-//    void *myso = dlopen("test.dll", RTLD_NOW);
+uint16_t comm_get_device_list(void) {
 
-    //if (myso == NULL) {
-    //    printf("%s\n", dllerror());
-    //}else {
-    //    printf("library loaded\n);
-    //    dlclose(myso);
-    //}
-
-//some_func *func = dlsym(mvso, "function_name_to_fetch");
-//func(foo);
-//dlcose();
+    return 0;
+}
 

@@ -7,6 +7,4 @@
 
 #include "../include/main.h"
 
-uint16_t comm_get_device_list(void);
-
 #endif //COMM_RUSOKU_H

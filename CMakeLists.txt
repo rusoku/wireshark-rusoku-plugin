@@ -26,7 +26,7 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 
 if(WIN32)
     message("OS:win32")
-    target_link_libraries(${PROJECT_NAME} -lpthread -ldl )
+    target_link_libraries(${PROJECT_NAME} -lpthread -ldl)
 elseif(APPLE)
     message("OS:apple")
     target_link_libraries(${PROJECT_NAME} -lpthread)
