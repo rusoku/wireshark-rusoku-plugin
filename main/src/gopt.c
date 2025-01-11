@@ -26,7 +26,7 @@
 #include <strings.h>
 #endif
 
-#include "../include/gopt.h"
+#include "../inc/gopt.h"
 
 
 /* returns index of first exact match or only prefix match, or last index */

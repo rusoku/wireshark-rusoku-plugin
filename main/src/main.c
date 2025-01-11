@@ -16,9 +16,9 @@ https://www.ietf.org/archive/id/draft-gharris-opsawg-pcap-00.html#name-packet-re
 https://munich.dissec.to/kb/chapters/can/can-socketcan.html
 */
 
-#include "../include/gopt.h"
-#include "../include/main.h"
-#include "../include/capture.h"
+#include "../inc/gopt.h"
+#include "../inc/main.h"
+#include "../inc/capture.h"
 
 /*
     ~/Library/Logs for user-oriented info from non-system software

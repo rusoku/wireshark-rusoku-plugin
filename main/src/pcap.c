@@ -2,7 +2,7 @@
 // Created by Gediminas Simanskis on 29/12/2024.
 //
 
-#include "../include/pcap.h"
+#include "../inc/pcap.h"
 #include <math.h>
 
 /*

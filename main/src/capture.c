@@ -2,9 +2,9 @@
 // Created by Gediminas Simanskis on 30/12/2024.
 //
 
-#include "../include/main.h"
-#include "../include/pcap.h"
-#include "../include/capture.h"
+#include "../inc/main.h"
+#include "../inc/pcap.h"
+#include "../inc/capture.h"
 
 #include <stdbool.h>
 

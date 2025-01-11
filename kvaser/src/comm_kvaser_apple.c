@@ -2,8 +2,8 @@
 // Created by gedsi on 2025-01-06.
 //
 
-#include "../include/comm_rusoku.h"
-#include "../include/comm_base.h"
+#include "../inc/comm_kvaser_apple.h"
+#include "../../main/inc/comm_base.h"
 
 
 static uint32_t hcanal;

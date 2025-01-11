@@ -5,7 +5,7 @@
 #ifndef COMMUNICATIONS_H
 #define COMMUNICATIONS_H
 
-#include "../include/main.h"
+#include "../inc/main.h"
 
 enum ERROR_CODES {
     COMM_SUCCESS = 0,
