@@ -18,7 +18,7 @@ https://munich.dissec.to/kb/chapters/can/can-socketcan.html
 
 #include "../inc/gopt.h"
 #include "../inc/main.h"
-#include "../inc/capture.h"
+#include "../inc/capture_demo.h"
 
 /*
     ~/Library/Logs for user-oriented info from non-system software

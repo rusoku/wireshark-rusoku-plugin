@@ -12,8 +12,8 @@ set(SOURCES
         inc/pcap.h
         inc/control_packet_headers.h
         src/pcap.c
-        src/capture.c
-        inc/capture.h
+        src/capture_demo.c
+        inc/capture_demo.h
         src/comm_base.c
         inc/comm_base.h
 )
