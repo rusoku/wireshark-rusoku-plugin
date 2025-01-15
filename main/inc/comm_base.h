@@ -7,29 +7,75 @@
 
 #include "../inc/main.h"
 
+#define COMM_TOTAL_DEVICES  8
+
+
 enum ERROR_CODES {
     COMM_SUCCESS = 0,
-    COMM_LIB_ERROR = -1,
+    COMM_LIB_ERROR_NULL = -1,
 };
 
 enum COMM_MANUFACTURER {
-    RUSOKU = 0,
+    MANUFACTURER_NONE = 0,
+    RUSOKU,
     KVASER,
     PEAK
 };
 
 enum COMM_DEVICE_TYPE {
-    TOUCAN = 0
+    DEVICE_TYPE_NONE = 0,
+    TOUCAN
 };
 
 struct COMM_DEVICE {
     uint16_t id;
-    uint16_t type;
-    uint16_t manufacturer;
+    enum COMM_MANUFACTURER manufacturer;
+    enum COMM_DEVICE_TYPE device_type;
     char model[128];
     char serial[128];
-    uint16_t (*comm_init)(void);
-    uint16_t (*comm_get_device_list)(void);
 };
+
+// CAN flags values
+#define CAN_FLAG_STANDARD    0x00000000L
+#define CAN_FLAG_EXTENDED    0x00000001L
+#define CAN_FLAG_RTR         0x00000002L
+#define CAN_FLAG_STATUS      0x00000004L
+#define CAN_FLAG_CAN_FD      0x00000008L
+#define CAN_FLAG_CAN_XT      0x00000010L
+#define CAN_FLAG_SEND        0x80000000L
+
+// CAN error codes
+#define CAN_STATUS_OK 0x00    // normal condition.
+#define CAN_STATUS_OVERRUN 0x01
+#define CAN_STATUS_BUSLIGHT 0x02
+#define CAN_STATUS_BUSHEAVY 0x03
+#define CAN_STATUS_BUSOFF   0x04
+
+struct COMM_CAN_MSG {
+    uint32_t id;
+    uint32_t error_status; // error counters (if CAN_FLAG_STATUS is set)
+    uint32_t error_code; // error codes
+    uint32_t flags; // can flags: STD, EXT, CAN FD etc.
+    uint8_t length;
+    uint8_t data[64];
+};
+
+typedef uint32_t COMM_DEV_HANDLE;
+
+enum ERROR_CODES comm_init(char *error_code);
+
+enum ERROR_CODES comm_deinit(void);
+
+enum ERROR_CODES comm_get_device_list(struct COMM_DEVICE *comm_devices, uint32_t *num_devices);
+
+enum ERROR_CODES comm_open_device(COMM_DEV_HANDLE *comm_dev_handle, char *dev_name);
+
+enum ERROR_CODES comm_close_device(COMM_DEV_HANDLE *comm_dev_handle);
+
+enum ERROR_CODES comm_get_device_data_available(COMM_DEV_HANDLE *comm_dev_handle, struct COMM_CAN_MSG *comm_can_msg);
+
+enum ERROR_CODES comm_read_frame(COMM_DEV_HANDLE *comm_dev_handle, struct COMM_CAN_MSG *comm_can_msg);
+
+enum ERROR_CODES comm_write_frame(COMM_DEV_HANDLE *comm_dev_handle, struct COMM_CAN_MSG *comm_can_msg);
 
 #endif //COMMUNICATIONS_H

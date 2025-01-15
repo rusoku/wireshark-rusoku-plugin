@@ -6,4 +6,4 @@ set(PROJECT_NAME RusokuWiresharkPlugins)
 
 ADD_SUBDIRECTORY(main)
 ADD_SUBDIRECTORY(rusoku)
-ADD_SUBDIRECTORY(kvaser)
+#ADD_SUBDIRECTORY(kvaser)

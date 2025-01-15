@@ -7,13 +7,12 @@ set(PROJECT_NAME RusokuExtcapPlugin)
 if(WIN32)
     set(SOURCES
         src/comm_rusoku_win.c
-        inc/comm_rusoku_win.h
-)
+    )
 elseif(APPLE)
     set(SOURCES
         src/comm_rusoku_apple.c
-        inc/comm_rusoku_apple.h
-)
+            inc/comm_rusoku_win.h
+    )
 endif()
 
 add_executable(${PROJECT_NAME} ${SOURCES})

@@ -2,29 +2,20 @@
 // Created by gedsi on 2025-01-06.
 //
 
-#include "../inc/comm_rusoku_win.h"
 #include "../../main/inc/comm_base.h"
-
-
-static uint32_t hcanal;
-
-typedef uint32_t (*CanalOpen_fp)(const char *pConfigStr, unsigned long flags);
+#include "../inc/comm_rusoku_win.h"
 
 CanalOpen_fp CanalOpen;
+CanalClose_fp CanalClose;
+CanalDataAvailable_fp CanalDataAvailable;
+CanalReceive_fp CanalReceive;
+CanalSend_fp CanalSend;
+CanalGetStatus_fp CanalGetStatus;
 
-int16_t comm_init_rusoku(void *handler, char *error_code){
+static void *handler = NULL;
 
-    if (handler == NULL) {
-        return COMM_LIB_ERROR;
-    }
-
-#if defined __WIN32__ || defined __WIN64__
+enum ERROR_CODES comm_init(char *error_code) {
     handler = dlopen("canal.dll", RTLD_NOW);
-#elif defined __APPLE__
-    handler = dlopen("uvcantou.dylib", RTLD_NOW);
-#else
-    handler = dlopen("uvcantou.so", RTLD_NOW);
-#endif
 
     if (handler == NULL) {
         if (error_code != NULL) {
@@ -33,16 +24,42 @@ int16_t comm_init_rusoku(void *handler, char *error_code){
     }
 
     CanalOpen = dlsym(handler, "CanalOpen");
-    //CanalOpen("0;00005499;250", 0);
-
-    return  COMM_SUCCESS;
-};
-
-int16_t comm_deinit_rusoku(void *handler){
-
-    if (handler == NULL) {
-        return COMM_LIB_ERROR;
+    if (CanalOpen == NULL) {
+        return COMM_LIB_ERROR_NULL;
     }
-    dlclose(handler);
-    return  COMM_SUCCESS;
+    CanalClose = dlsym(handler, "CanalClose");
+    if (CanalClose == NULL) {
+        return COMM_LIB_ERROR_NULL;
+    }
+    CanalDataAvailable = dlsym(handler, "CanalDataAvailable");
+    if (CanalDataAvailable == NULL) {
+        return COMM_LIB_ERROR_NULL;
+    }
+    CanalReceive = dlsym(handler, "CanalReceive");
+    if (CanalReceive == NULL) {
+        return COMM_LIB_ERROR_NULL;
+    }
+    CanalSend = dlsym(handler, "CanalSend");
+    if (CanalSend == NULL) {
+        return COMM_LIB_ERROR_NULL;
+    }
+    CanalGetStatus = dlsym(handler, "CanalGetStatus");
+    if (CanalGetStatus == NULL) {
+        return COMM_LIB_ERROR_NULL;
+    }
+
+    return COMM_SUCCESS;
 };
+
+enum ERROR_CODES comm_deinit(void) {
+    dlclose(handler);
+    return COMM_SUCCESS;
+};
+
+enum ERROR_CODES comm_get_device_list(struct COMM_DEVICE *comm_devices, uint32_t *num_devices) {
+    if (comm_devices == NULL || num_devices == NULL) {
+        return COMM_LIB_ERROR_NULL;
+    }
+
+    return COMM_SUCCESS;
+}

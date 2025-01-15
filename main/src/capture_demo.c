@@ -5,6 +5,7 @@
 #include "../inc/main.h"
 #include "../inc/pcap.h"
 #include "../inc/capture_demo.h"
+#include "../inc/comm_base.h"
 
 #include <stdbool.h>
 
@@ -12,6 +13,7 @@ void capture_demo(char *fifo_name, struct INTERFACE_PARAMETERS *interface_parame
 {
         if (interface == -1)
                 exit (EXIT_FAILURE);
+
 
         struct CAN_FRAME can_frame[] = {
         {0x7E8, 0, 8, 0x10, 0x2D, 0x62, 0xE0, 0x01, 0x9F, 0xF7, 0xFE},

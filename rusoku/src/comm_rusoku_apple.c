@@ -12,7 +12,7 @@ typedef uint32_t (*CanalOpen_fp)(const char *pConfigStr, unsigned long flags);
 
 CanalOpen_fp CanalOpen;
 
-int16_t comm_init_rusoku(void *handler, char *error_code){
+enum ERROR_CODES comm_init_rusoku(void *handler, char *error_code){
 
     if (handler == NULL) {
         return COMM_LIB_ERROR;
@@ -38,7 +38,7 @@ int16_t comm_init_rusoku(void *handler, char *error_code){
     return  COMM_SUCCESS;
 };
 
-int16_t comm_deinit_rusoku(void *handler){
+enum ERROR_CODES comm_deinit_rusoku(void *handler){
 
     if (handler == NULL) {
         return COMM_LIB_ERROR;

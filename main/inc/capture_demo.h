@@ -5,6 +5,8 @@
 #ifndef CAPTURE_DEMO_H
 #define CAPTURE_DEMO_H
 
+#include "stdint.h"
+
 void capture_demo(char *fifo_name, struct INTERFACE_PARAMETERS *interface_parameters, int16_t interface);
 
 #endif //CAPTURE_H

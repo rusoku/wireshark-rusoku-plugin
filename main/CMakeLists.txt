@@ -14,6 +14,8 @@ set(SOURCES
         src/pcap.c
         src/capture_demo.c
         inc/capture_demo.h
+        src/capture.c
+        inc/capture.h
         src/comm_base.c
         inc/comm_base.h
 )
