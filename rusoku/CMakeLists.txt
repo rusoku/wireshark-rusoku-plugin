@@ -20,6 +20,8 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME} RusokuExtcapLib)
 
 if(WIN32)
     message("OS:win32")
+    set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static") # for C
+    #set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++ -static") # for C++ //dependency walker
     target_link_libraries(${PROJECT_NAME} -lpthread -ldl)
 elseif(APPLE)
     message("OS:apple")

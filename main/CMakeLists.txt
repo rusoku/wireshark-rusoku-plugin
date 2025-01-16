@@ -24,9 +24,13 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES})
 #add_executable(${PROJECT_NAME} ${SOURCES})
 #TARGET_LINK_LIBRARIES(${PACKAGE_NAME} RusokuExtcapPlugin)
 
+#target_link_libraries(main -Wl,-Bstatic bingitup -Wl,-Bdynamic)
+
 if(WIN32)
     message("OS:win32")
-    target_link_libraries(${PROJECT_NAME} -lpthread -ldl)
+    #target_link_libraries(${PROJECT_NAME} -nodefaultlibs -lpthread -ldl)
+    target_link_libraries(${PROJECT_NAME} -lpthread -dl)
+
 elseif(APPLE)
     message("OS:apple")
     target_link_libraries(${PROJECT_NAME} -lpthread)

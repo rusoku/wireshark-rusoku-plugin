@@ -104,23 +104,22 @@ int main(int argc, char **argv) {
 
     // extcap-interfaces
     if (options[EXTCAP_INTERFACES].count) {
-        struct COMM_DEVICE comm_device;
-        uint32_t comm_device_numbers;
-
-        comm_init(NULL);
-        comm_get_device_list(&comm_device, &comm_device_numbers);
-        comm_deinit();
-
         printf("extcap {version=1.0}{help=https://www.rusoku.org}{display=RUSOKU CAN USB adapter extcap interface}\n");
-        printf("interface {value=0}{display=Toucan CAN adapter interface 0 - (VIRTUAL DEMO RANDOM PACKETS)}\n");
-        //printf("interface {value=1}{display=Toucan CAN adapter interface 1 - (RUSOKU TouCAN sn: xxxxxxxx )}\n");
-        //printf("interface {value=2}{display=Toucan CAN adapter interface 2 - (RUSOKU TouCAN sn: xxxxxxxx )}\n");
-        //printf("interface {value=3}{display=Toucan CAN adapter interface 3 - (RUSOKU TouCAN sn: xxxxxxxx )}\n");
-        //printf("interface {value=4}{display=Toucan CAN adapter interface 4 - (RUSOKU TouCAN sn: xxxxxxxx )}\n");
-        //printf("interface {value=5}{display=Toucan CAN adapter interface 5 - (RUSOKU TouCAN sn: xxxxxxxx )}\n");
-        //printf("interface {value=6}{display=Toucan CAN adapter interface 6 - (RUSOKU TouCAN sn: xxxxxxxx )}\n");
-        //printf("interface {value=7}{display=Toucan CAN adapter interface 7 - (RUSOKU TouCAN sn: xxxxxxxx )}\n");
-        //printf("interface {value=8}{display=Toucan CAN adapter interface 8 - (RUSOKU TouCAN sn: xxxxxxxx )}\n");
+
+        struct COMM_DEVICE comm_devices[8] = {};
+        uint32_t comm_device_cnt = 0;
+
+        if (comm_get_device_list(comm_devices, &comm_device_cnt) != COMM_SUCCESS) {
+            fprintf(stderr, "comm_get_device_list failed\n");
+            exit(EXIT_FAILURE);
+        }
+
+        for (int index = 0; index < comm_device_cnt; index++) {
+            printf("interface {value=%d}{display=Toucan CAN adapter interface %d - (RUSOKU TouCAN s/n: %s)}\n",
+                   index,
+                   index,
+                   comm_devices[index].serial );
+        }
 
         //        printf("control {number=0}{type=string}{display=Msg ID}{tooltip=Custom frame message ID (0xNNNNNNNN)}{validation=^(([01][a-fA-F0-9]\\{0,7\\})|([a-fA-F0-9]\\{0,7\\}))$}\n");
         //        printf("control {number=1}{type=boolean}{display=Extended}{tooltip=Extended CAN frame}{default=true}\n");

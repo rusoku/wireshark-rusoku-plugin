@@ -10,9 +10,10 @@
 #define COMM_TOTAL_DEVICES  8
 
 
-enum ERROR_CODES {
+enum COMM_ERROR_CODES {
     COMM_SUCCESS = 0,
-    COMM_LIB_ERROR_NULL = -1,
+    COMM_LIB_ERROR_NULL = 1,
+    COMM_LIB_ERROR = 2
 };
 
 enum COMM_MANUFACTURER {
@@ -31,8 +32,8 @@ struct COMM_DEVICE {
     uint16_t id;
     enum COMM_MANUFACTURER manufacturer;
     enum COMM_DEVICE_TYPE device_type;
-    char model[128];
-    char serial[128];
+    char model[16];
+    char serial[16];
 };
 
 // CAN flags values
@@ -62,20 +63,21 @@ struct COMM_CAN_MSG {
 
 typedef uint32_t COMM_DEV_HANDLE;
 
-enum ERROR_CODES comm_init(char *error_code);
+enum COMM_ERROR_CODES comm_init(char *error_code);
 
-enum ERROR_CODES comm_deinit(void);
+enum COMM_ERROR_CODES comm_deinit(void);
 
-enum ERROR_CODES comm_get_device_list(struct COMM_DEVICE *comm_devices, uint32_t *num_devices);
+enum COMM_ERROR_CODES comm_get_device_list(struct COMM_DEVICE *comm_devices, uint32_t *num_devices);
 
-enum ERROR_CODES comm_open_device(COMM_DEV_HANDLE *comm_dev_handle, char *dev_name);
+enum COMM_ERROR_CODES comm_open_device(COMM_DEV_HANDLE *comm_dev_handle, char *dev_name);
 
-enum ERROR_CODES comm_close_device(COMM_DEV_HANDLE *comm_dev_handle);
+enum COMM_ERROR_CODES comm_close_device(COMM_DEV_HANDLE *comm_dev_handle);
 
-enum ERROR_CODES comm_get_device_data_available(COMM_DEV_HANDLE *comm_dev_handle, struct COMM_CAN_MSG *comm_can_msg);
+enum COMM_ERROR_CODES comm_get_device_data_available(COMM_DEV_HANDLE *comm_dev_handle,
+                                                     struct COMM_CAN_MSG *comm_can_msg);
 
-enum ERROR_CODES comm_read_frame(COMM_DEV_HANDLE *comm_dev_handle, struct COMM_CAN_MSG *comm_can_msg);
+enum COMM_ERROR_CODES comm_read_frame(COMM_DEV_HANDLE *comm_dev_handle, struct COMM_CAN_MSG *comm_can_msg);
 
-enum ERROR_CODES comm_write_frame(COMM_DEV_HANDLE *comm_dev_handle, struct COMM_CAN_MSG *comm_can_msg);
+enum COMM_ERROR_CODES comm_write_frame(COMM_DEV_HANDLE *comm_dev_handle, struct COMM_CAN_MSG *comm_can_msg);
 
 #endif //COMMUNICATIONS_H

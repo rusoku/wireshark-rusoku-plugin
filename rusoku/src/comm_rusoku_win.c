@@ -16,8 +16,8 @@ CanalGetStatus_fp CanalGetStatus;
 
 static void *handler = NULL;
 
-enum ERROR_CODES comm_init(char *error_code) {
-    handler = dlopen("canal.dll", RTLD_NOW);
+enum COMM_ERROR_CODES comm_init(char *error_code) {
+    handler = dlopen("canal.dll", RTLD_LAZY);
 
     if (handler == NULL) {
         if (error_code != NULL) {
@@ -61,19 +61,57 @@ enum ERROR_CODES comm_init(char *error_code) {
     return COMM_SUCCESS;
 };
 
-enum ERROR_CODES comm_deinit(void) {
+enum COMM_ERROR_CODES comm_deinit(void) {
     dlclose(handler);
     handler = NULL;
     return COMM_SUCCESS;
 };
 
-enum ERROR_CODES comm_get_device_list(struct COMM_DEVICE *comm_devices, uint32_t *num_devices) {
+enum COMM_ERROR_CODES comm_get_device_list(struct COMM_DEVICE *comm_devices, uint32_t *num_devices) {
+    /*
+    struct CANAL_DEV_INFO {
+        uint16_t DeviceId;
+        uint16_t vid;
+        uint16_t pid;
+        char SerialNumber[16];
+    };
+
+    struct CANAL_DEV_LIST {
+        struct CANAL_DEV_INFO canDevInfo[CANAL_DEVLIST_SIZE_MAX];
+        uint16_t canDevCount;
+    };
+
+    typedef struct COMM_DEVICE {
+        uint16_t id;
+        enum COMM_MANUFACTURER manufacturer;
+        enum COMM_DEVICE_TYPE device_type;
+        char model[16];
+        char serial[16];
+    }COMM_DEVICES[8];
+  */
+
     if (comm_devices == NULL || num_devices == NULL) {
         return COMM_LIB_ERROR_NULL;
     }
 
     if (handler == NULL) {
-        comm_init(NULL);
+        if (comm_init(NULL) != COMM_SUCCESS) {
+            return COMM_LIB_ERROR_NULL;
+        }
+    }
+
+    //canal_dev_list CanalDevList; // CANAL device list
+    struct CANAL_DEV_LIST CanalDevList;
+    if (CanalGetDeviceList(&CanalDevList, 8) != CANAL_ERROR_SUCCESS) {
+        return COMM_LIB_ERROR;
+    }
+
+    *num_devices = CanalDevList.canDevCount;
+
+    for (uint8_t index = 0; index < CanalDevList.canDevCount; index++) {
+        //printf("SERIAL %s\n", CanalDevList.canDevInfo[index].SerialNumber);
+        strcpy(comm_devices[index].serial, CanalDevList.canDevInfo[index].SerialNumber);
+        comm_devices[index].id = index;
     }
 
     return COMM_SUCCESS;
