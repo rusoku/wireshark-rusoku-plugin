@@ -7,6 +7,8 @@
 
 CanalOpen_fp CanalOpen;
 CanalClose_fp CanalClose;
+CanalGetDeviceList_fp CanalGetDeviceList;
+CanalGetSerialNumber_fp CanalGetSerialNumber;
 CanalDataAvailable_fp CanalDataAvailable;
 CanalReceive_fp CanalReceive;
 CanalSend_fp CanalSend;
@@ -31,6 +33,14 @@ enum ERROR_CODES comm_init(char *error_code) {
     if (CanalClose == NULL) {
         return COMM_LIB_ERROR_NULL;
     }
+    CanalGetDeviceList = dlsym(handler, "CanalGetDeviceList");
+    if (CanalGetDeviceList == NULL) {
+        return COMM_LIB_ERROR_NULL;
+    }
+    CanalGetSerialNumber = dlsym(handler, "CanalGetSerialNumber");
+    if (CanalGetSerialNumber == NULL) {
+        return COMM_LIB_ERROR_NULL;
+    }
     CanalDataAvailable = dlsym(handler, "CanalDataAvailable");
     if (CanalDataAvailable == NULL) {
         return COMM_LIB_ERROR_NULL;
@@ -53,12 +63,17 @@ enum ERROR_CODES comm_init(char *error_code) {
 
 enum ERROR_CODES comm_deinit(void) {
     dlclose(handler);
+    handler = NULL;
     return COMM_SUCCESS;
 };
 
 enum ERROR_CODES comm_get_device_list(struct COMM_DEVICE *comm_devices, uint32_t *num_devices) {
     if (comm_devices == NULL || num_devices == NULL) {
         return COMM_LIB_ERROR_NULL;
+    }
+
+    if (handler == NULL) {
+        comm_init(NULL);
     }
 
     return COMM_SUCCESS;
