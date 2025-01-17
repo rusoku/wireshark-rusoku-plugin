@@ -9,13 +9,12 @@
 
 #include <stdbool.h>
 
-void capture_demo(char *fifo_name, struct INTERFACE_PARAMETERS *interface_parameters, int16_t interface)
-{
-        if (interface == -1)
-                exit (EXIT_FAILURE);
+void capture_demo(char *fifo_name, struct INTERFACE_PARAMETERS *interface_parameters, int16_t interface) {
+    if (interface == -1)
+        exit(EXIT_FAILURE);
 
 
-        struct CAN_FRAME can_frame[] = {
+    struct CAN_FRAME can_frame[] = {
         {0x7E8, 0, 8, 0x10, 0x2D, 0x62, 0xE0, 0x01, 0x9F, 0xF7, 0xFE},
         {0x7E8, 0, 8, 0x21, 0x00, 0x00, 0xAA, 0x00, 0x00, 0x00, 0x00},
         {0x7E8, 0, 8, 0x22, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
@@ -25,37 +24,35 @@ void capture_demo(char *fifo_name, struct INTERFACE_PARAMETERS *interface_parame
         {0x7E8, 0, 8, 0x21, 0, 0, 0, 0, 0, 0, 0},
         {0x7E8, 0, 8, 0x10, 0x2D, 0x62, 0xE0, 0x01, 0x9F, 0xF7, 0xFE},
         {0x7E8, 0, 8, 0x21, 0, 0, 0xAE, 0, 0, 0, 0}
-        };
+    };
 
-        FILE *fp;
-        struct PCAP_FILE_HEADER pcap_file_header = {};
-        struct PCAP_PACKET_RECORD_HEADER pcap_packet = {};
-        struct PCAP_LINKTYPE_CAN_SOCKETCAN pcap_linktype_socketcan = {};
+    FILE *fp;
+    struct PCAP_FILE_HEADER pcap_file_header = {};
+    struct PCAP_PACKET_RECORD_HEADER pcap_packet = {};
+    struct PCAP_LINKTYPE_CAN_SOCKETCAN pcap_linktype_socketcan = {};
 
-        fp = fopen(fifo_name, "wb");
-        if (fp == NULL)
-                exit (EXIT_FAILURE);
-        //setvbuf(fp, NULL, _IONBF, 0);
+    fp = fopen(fifo_name, "wb");
+    if (fp == NULL)
+        exit(EXIT_FAILURE);
+    //setvbuf(fp, NULL, _IONBF, 0);
 
-        init_pcap_file_header(&pcap_file_header, LINKTYPE_CAN_SOCKETCAN);
-        fwrite(&pcap_file_header, sizeof(struct PCAP_FILE_HEADER), 1, fp);
-        fflush(fp);
+    init_pcap_file_header(&pcap_file_header, LINKTYPE_CAN_SOCKETCAN);
+    fwrite(&pcap_file_header, sizeof(struct PCAP_FILE_HEADER), 1, fp);
+    fflush(fp);
 
-        while (1)
-        {
-                for (uint32_t x = 0; x <= sizeof(sizeof(can_frame)/sizeof(can_frame[0])); x++)
-                {
-                        pcap_packet = init_pcap_pkt_header(PCAP_SOCKETCAN_PKT_LEN, PCAP_SOCKETCAN_PKT_LEN);
-                        fwrite(&pcap_packet, sizeof(struct PCAP_PACKET_RECORD_HEADER), 1, fp);
+    while (1) {
+        for (uint32_t x = 0; x <= sizeof(sizeof(can_frame) / sizeof(can_frame[0])); x++) {
+            pcap_packet = init_pcap_pkt_header(PCAP_SOCKETCAN_PKT_LEN, PCAP_SOCKETCAN_PKT_LEN);
+            fwrite(&pcap_packet, sizeof(struct PCAP_PACKET_RECORD_HEADER), 1, fp);
 
-                        //pcap_linktype_socketcan = init_socketcan_linktype_header();
-                        pcap_linktype_socketcan = prepare_socketcan_linktype_from_canframe(&can_frame[x]);
-                        fwrite(&pcap_linktype_socketcan, sizeof(struct PCAP_LINKTYPE_CAN_SOCKETCAN), 1, fp);
+            //pcap_linktype_socketcan = init_socketcan_linktype_header();
+            pcap_linktype_socketcan = prepare_socketcan_linktype_from_canframe(&can_frame[x]);
+            fwrite(&pcap_linktype_socketcan, sizeof(struct PCAP_LINKTYPE_CAN_SOCKETCAN), 1, fp);
 
-                        fflush(fp);
-                        usleep(1000);
-                }
-                while (1)
-                        usleep(1000);
+            fflush(fp);
+            usleep(1000);
         }
+        while (1)
+            usleep(1000);
+    }
 }

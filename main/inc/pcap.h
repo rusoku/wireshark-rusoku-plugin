@@ -24,7 +24,6 @@
 #define PKTTYPE_CAN_RX			0x1
 #define HATYPE_ARPHRD_NONE      0xFFFE
 #define CAN_MAX_DLEN			8
-#define CAN_MAX_DLEN			8
 
 #ifdef __GNUC__
 #define PACK__
