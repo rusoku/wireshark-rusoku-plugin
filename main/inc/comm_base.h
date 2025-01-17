@@ -2,13 +2,14 @@
 // Created by gedsi on 2025-01-06.
 //
 
-#ifndef COMMUNICATIONS_H
-#define COMMUNICATIONS_H
+#ifndef COMM_BASE_H
+#define COMM_BASE_H
 
 #include "../inc/main.h"
 
 #define COMM_TOTAL_DEVICES  8
-
+#define MANUFACTURER "RUSOKU"
+#define MODEL_TOUCAN "TouCAN"
 
 enum COMM_ERROR_CODES {
     COMM_SUCCESS = 0,
@@ -23,16 +24,17 @@ enum COMM_MANUFACTURER {
     PEAK
 };
 
-enum COMM_DEVICE_TYPE {
-    DEVICE_TYPE_NONE = 0,
+enum COMM_DEVICE_MODEL {
+    DEVICE_MODEL_NONE = 0,
     TOUCAN
 };
 
 struct COMM_DEVICE {
     uint16_t id;
     enum COMM_MANUFACTURER manufacturer;
-    enum COMM_DEVICE_TYPE device_type;
-    char model[16];
+    enum COMM_DEVICE_MODEL device_model;
+    char manufacturer_str[64];
+    char device_model_str[64];
     char serial[16];
 };
 

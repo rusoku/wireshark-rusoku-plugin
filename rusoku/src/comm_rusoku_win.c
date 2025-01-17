@@ -5,6 +5,9 @@
 #include "../../main/inc/comm_base.h"
 #include "../inc/comm_rusoku_win.h"
 
+struct COMM_DEVICE comm_devices[8] = {};
+uint32_t comm_device_cnt = 0;
+
 CanalOpen_fp CanalOpen;
 CanalClose_fp CanalClose;
 CanalGetDeviceList_fp CanalGetDeviceList;
@@ -84,8 +87,9 @@ enum COMM_ERROR_CODES comm_get_device_list(struct COMM_DEVICE *comm_devices, uin
     typedef struct COMM_DEVICE {
         uint16_t id;
         enum COMM_MANUFACTURER manufacturer;
-        enum COMM_DEVICE_TYPE device_type;
-        char model[16];
+        enum COMM_DEVICE_MODEL device_model;
+        char manufacturer_str[64];
+        char device_model_str[64];
         char serial[16];
     }COMM_DEVICES[8];
   */
@@ -109,8 +113,9 @@ enum COMM_ERROR_CODES comm_get_device_list(struct COMM_DEVICE *comm_devices, uin
     *num_devices = CanalDevList.canDevCount;
 
     for (uint8_t index = 0; index < CanalDevList.canDevCount; index++) {
-        //printf("SERIAL %s\n", CanalDevList.canDevInfo[index].SerialNumber);
         strcpy(comm_devices[index].serial, CanalDevList.canDevInfo[index].SerialNumber);
+        strcpy(comm_devices[index].manufacturer_str, MANUFACTURER);
+        strcpy(comm_devices[index].device_model_str, MODEL_TOUCAN);
         comm_devices[index].id = index;
     }
 

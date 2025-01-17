@@ -21,6 +21,7 @@ https://munich.dissec.to/kb/chapters/can/can-socketcan.html
 #include "../inc/capture_demo.h"
 #include "../inc/capture.h"
 #include "../inc/comm_base.h"
+#include "../../rusoku/inc/comm_rusoku_win.h"
 
 /*
     ~/Library/Logs for user-oriented info from non-system software
@@ -29,7 +30,7 @@ https://munich.dissec.to/kb/chapters/can/can-socketcan.html
 */
 
 int main(int argc, char **argv) {
-    struct option options[17];
+    struct option options[GOPT_LAST_OPT+1];
     int16_t interface = -1;
     struct INTERFACE_PARAMETERS interface_parameters[8] = {};
     char *fifo_name;
@@ -78,24 +79,32 @@ int main(int argc, char **argv) {
     options[PARAMETER_BITRATE].short_name = 'A';
     options[PARAMETER_BITRATE].flags = GOPT_ARGUMENT_REQUIRED;
 
+    options[PARAMETER_BITRATE_DATA].long_name = "parameter_bitrate_data";
+    options[PARAMETER_BITRATE_DATA].short_name = 'B';
+    options[PARAMETER_BITRATE_DATA].flags = GOPT_ARGUMENT_REQUIRED;
+
     options[PARAMETER_SILENT].long_name = "parameter_silent";
-    options[PARAMETER_SILENT].short_name = 'B';
+    options[PARAMETER_SILENT].short_name = 'C';
     options[PARAMETER_SILENT].flags = GOPT_ARGUMENT_REQUIRED;
 
     options[PARAMETER_LOOPBACK].long_name = "parameter_loopback";
-    options[PARAMETER_LOOPBACK].short_name = 'C';
+    options[PARAMETER_LOOPBACK].short_name = 'D';
     options[PARAMETER_LOOPBACK].flags = GOPT_ARGUMENT_REQUIRED;
 
+    options[PARAMETER_CANFD].long_name = "parameter_canfd";
+    options[PARAMETER_CANFD].short_name = 'E';
+    options[PARAMETER_CANFD].flags = GOPT_ARGUMENT_REQUIRED;
+
     options[LOG_LEVEL].long_name = "log-level";
-    options[LOG_LEVEL].short_name = 'D';
+    options[LOG_LEVEL].short_name = 'F';
     options[LOG_LEVEL].flags = GOPT_ARGUMENT_REQUIRED;
 
     options[LOG_FILE].long_name = "log-file";
-    options[LOG_FILE].short_name = 'E';
+    options[LOG_FILE].short_name = 'G';
     options[LOG_FILE].flags = GOPT_ARGUMENT_REQUIRED;
 
     options[CAPTURE].long_name = "capture";
-    options[CAPTURE].short_name = 'F';
+    options[CAPTURE].short_name = 'H';
     options[CAPTURE].flags = GOPT_ARGUMENT_FORBIDDEN;
 
     options[GOPT_LAST_OPT].flags = GOPT_LAST;
@@ -106,19 +115,20 @@ int main(int argc, char **argv) {
     if (options[EXTCAP_INTERFACES].count) {
         printf("extcap {version=1.0}{help=https://www.rusoku.org}{display=RUSOKU CAN USB adapter extcap interface}\n");
 
-        struct COMM_DEVICE comm_devices[8] = {};
-        uint32_t comm_device_cnt = 0;
-
         if (comm_get_device_list(comm_devices, &comm_device_cnt) != COMM_SUCCESS) {
             fprintf(stderr, "comm_get_device_list failed\n");
             exit(EXIT_FAILURE);
         }
 
         for (int index = 0; index < comm_device_cnt; index++) {
-            printf("interface {value=%d}{display=Toucan CAN adapter interface %d - (RUSOKU TouCAN s/n: %s)}\n",
-                   index,
-                   index,
-                   comm_devices[index].serial );
+            //printf("interface {value=%d}{display=Toucan CAN adapter interface %d - (RUSOKU TouCAN s/n: %s)}\n",
+            printf("interface {value=%d}{display=%s CAN adapter interface %d - (%s %s s/n: %s)}\n",
+                    index,
+                    comm_devices[index].device_model_str,
+                    index,
+                    comm_devices[index].manufacturer_str,
+                    comm_devices[index].device_model_str,
+                    comm_devices[index].serial);
         }
 
         //        printf("control {number=0}{type=string}{display=Msg ID}{tooltip=Custom frame message ID (0xNNNNNNNN)}{validation=^(([01][a-fA-F0-9]\\{0,7\\})|([a-fA-F0-9]\\{0,7\\}))$}\n");
@@ -139,7 +149,7 @@ int main(int argc, char **argv) {
     //extcap-version
     if (options[EXTCAP_VERSION].count) {
         //printf("extcap {version=1.0}{help=file:///Applications/Wireshark.app/Contents/Resources/share/wireshark/rusoku-wireshark-plugin.html}\n");
-        printf("extcap {version=1.0}{hel=https://www.rusoku.org}{display=RUSOKU CAN USB adapter extcap interface}\n");
+        printf("extcap {version=0.0.1}{hel=https://www.rusoku.org}{display=RUSOKU CAN USB adapter extcap interface}\n");
     }
 
     // extcap-config
@@ -147,12 +157,17 @@ int main(int argc, char **argv) {
         if (interface < 0 || interface > 7) {
             exit(EXIT_FAILURE);
         }
+
         printf(
-            "arg {number=0}{call=--parameter_bitrate}{display=Bitrate, kbps}{tooltip=Capture bitrate}{type=integer}{range=10,1000}{required=true}{default=125}\n");
+            "arg {number=0}{call=--parameter_canfd}{display=CAN FD mode}{tooltip=enable canfd mode}{type=boolflag}{required=true}{default=false}\n");
         printf(
-            "arg {number=1}{call=--parameter_silent}{display=Silent}{tooltip=enable silent mode}{type=boolflag}{required=true}{default=false}\n");
+            "arg {number=1}{call=--parameter_bitrate}{display=Bitrate, kbps}{tooltip=Capture bitrate}{type=integer}{range=10,10000}{required=true}{default=125}\n");
         printf(
-            "arg {number=2}{call=--parameter_loopback}{display=Loopback}{tooltip=enable loopback mode}{type=boolflag}{required=true}{default=false}\n");
+            "arg {number=2}{call=--parameter_bitrate}{display=Bitrate data, kbps}{tooltip=Capture bitrate data}{type=integer}{range=10,10000}{required=true}{default=125}\n");
+        printf(
+            "arg {number=3}{call=--parameter_silent}{display=Silent}{tooltip=enable silent mode}{type=boolflag}{required=true}{default=false}\n");
+        printf(
+            "arg {number=4}{call=--parameter_loopback}{display=Loopback}{tooltip=enable loopback mode}{type=boolflag}{required=true}{default=false}\n");
     }
 
     // extcap-dlts
@@ -171,6 +186,15 @@ int main(int argc, char **argv) {
         interface_parameters[interface].bitrate |= (int32_t) strtoll(options[PARAMETER_BITRATE].argument, NULL, 16);
     }
 
+    //extcap-bitrate-data
+    if (options[PARAMETER_BITRATE_DATA].count) {
+        if (interface < 0 || interface > 7) {
+            exit(EXIT_FAILURE);
+        }
+
+        interface_parameters[interface].bitrate_data |= (int32_t) strtoll(options[PARAMETER_BITRATE_DATA].argument, NULL, 16);
+    }
+
     //extcap-silent
     if (options[PARAMETER_SILENT].count) {
         if (interface < 0 || interface > 7) {
@@ -178,7 +202,7 @@ int main(int argc, char **argv) {
         }
 
         if ((int32_t) strtoll(options[PARAMETER_SILENT].argument, NULL, 16)) {
-            interface_parameters[interface].options |= INTERAFACE_PARAMETER_SILENT;
+            interface_parameters[interface].options |= INTERAFACE_PARAMETER_OPTION_SILENT;
         }
     }
 
@@ -189,7 +213,18 @@ int main(int argc, char **argv) {
         }
 
         if ((int32_t) strtoll(options[PARAMETER_LOOPBACK].argument, NULL, 16)) {
-            interface_parameters[interface].options |= INTERAFACE_PARAMETER_LOOPBACK;
+            interface_parameters[interface].options |= INTERAFACE_PARAMETER_OPTION_LOOPBACK;
+        }
+    }
+
+    //extcap-canfd
+    if (options[PARAMETER_CANFD].count) {
+        if (interface < 0 || interface > 7) {
+            exit(EXIT_FAILURE);
+        }
+
+        if ((int32_t) strtoll(options[PARAMETER_CANFD].argument, NULL, 16)) {
+            interface_parameters[interface].options |= INTERAFACE_PARAMETER_OPTION_CANFD;
         }
     }
 

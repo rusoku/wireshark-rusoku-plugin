@@ -2,8 +2,8 @@
 // Created by Gediminas Simanskis on 27/12/2024.
 //
 
-#ifndef PCAP_HEADERS_H
-#define PCAP_HEADERS_H
+#ifndef PCAP_H
+#define PCAP_H
 
 #include "../inc/main.h"
 

@@ -23,24 +23,28 @@
 #define EXTCAP_CONTROL_OUT      4
 #define EXTCAP_RELOAD_OPTION    5
 #define PARAMETER_BITRATE       6
-#define PARAMETER_SILENT        7
-#define PARAMETER_LOOPBACK      8
-#define LOG_LEVEL               9
-#define LOG_FILE                10
-#define EXTCAP_INTERFACES       11
-#define EXTCAP_VERSION          12
-#define EXTCAP_CONFIG           13
-#define EXTCAP_DLTS             14
-#define CAPTURE                 15
-#define GOPT_LAST_OPT           16
+#define PARAMETER_BITRATE_DATA  7
+#define PARAMETER_SILENT        8
+#define PARAMETER_LOOPBACK      9
+#define PARAMETER_CANFD         10
+#define LOG_LEVEL               11
+#define LOG_FILE                12
+#define EXTCAP_INTERFACES       13
+#define EXTCAP_VERSION          14
+#define EXTCAP_CONFIG           15
+#define EXTCAP_DLTS             16
+#define CAPTURE                 17
+#define GOPT_LAST_OPT           18
 
-#define INTERAFACE_PARAMETER_SILENT     1
-#define INTERAFACE_PARAMETER_LOOPBACK   2
+#define INTERAFACE_PARAMETER_OPTION_SILENT     0x00000001L
+#define INTERAFACE_PARAMETER_OPTION_LOOPBACK   0x00000002L
+#define INTERAFACE_PARAMETER_OPTION_CANFD      0x00000004L
 
-struct INTERFACE_PARAMETERS{
-    char        serial[16];
-    uint32_t    bitrate;
-    uint32_t    options;;
+struct INTERFACE_PARAMETERS {
+    char serial_str[16];
+    uint32_t bitrate; //can bitrate
+    uint32_t bitrate_data; //can fd bitrate
+    uint32_t options; //silent, loopbach, canfd, etc.
 };
 
 #endif //MAIN_H

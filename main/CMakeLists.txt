@@ -6,7 +6,6 @@ set(PROJECT_NAME RusokuExtcapLib)
 
 set(SOURCES
         src/gopt.c
-        src/main.c
         inc/gopt.h
         inc/main.h
         inc/pcap.h
@@ -18,6 +17,7 @@ set(SOURCES
         inc/capture.h
         src/comm_base.c
         inc/comm_base.h
+        src/main.c
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
