@@ -29,7 +29,7 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES})
 if(WIN32)
     message("OS:win32")
     #target_link_libraries(${PROJECT_NAME} -nodefaultlibs -lpthread -ldl)
-    target_link_libraries(${PROJECT_NAME} -lpthread -dl)
+    target_link_libraries(${PROJECT_NAME} -static -lpthread -dl)
 
 elseif(APPLE)
     message("OS:apple")

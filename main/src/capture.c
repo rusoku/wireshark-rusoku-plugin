@@ -11,8 +11,8 @@
 
 #include <stdbool.h>
 
-void capture(char *fifo_name, struct INTERFACE_PARAMETERS *interface_parameters, int16_t interface) {
-    if (interface == -1)
+void capture(char *fifo_name, struct INTERFACE_PARAMETERS interface_parameters) {
+    if (interface_parameters.interface_nr == -1)
         exit(EXIT_FAILURE);
 
     struct CAN_FRAME can_frame[] = {
@@ -37,13 +37,15 @@ void capture(char *fifo_name, struct INTERFACE_PARAMETERS *interface_parameters,
         exit(EXIT_FAILURE);
     //setvbuf(fp, NULL, _IONBF, 0);
 
-    init_pcap_file_header(&pcap_file_header, LINKTYPE_CAN_SOCKETCAN);
+    //switch ()
+
+    pcap_prepare_file_header(&pcap_file_header, LINKTYPE_CAN_SOCKETCAN);
     fwrite(&pcap_file_header, sizeof(struct PCAP_FILE_HEADER), 1, fp);
     fflush(fp);
 
     while (1) {
         for (uint32_t x = 0; x <= sizeof(sizeof(can_frame) / sizeof(can_frame[0])); x++) {
-            pcap_packet = init_pcap_pkt_header(PCAP_SOCKETCAN_PKT_LEN, PCAP_SOCKETCAN_PKT_LEN);
+            pcap_packet = pcap_prepare_pkt_header(PCAP_SOCKETCAN_PKT_LEN, PCAP_SOCKETCAN_PKT_LEN);
             fwrite(&pcap_packet, sizeof(struct PCAP_PACKET_RECORD_HEADER), 1, fp);
 
             //pcap_linktype_socketcan = init_socketcan_linktype_header();

@@ -8,11 +8,11 @@
 #include "../inc/main.h"
 
 #define LINKTYPE_LINUX_SLL      113
-#define DLT_LINUX_SLL           113
+#define DLT_LINUX_SLL           0
 #define LINKTYPE_LINUX_SLL2     276
-#define DLT_LINUX_SLL2          276
+#define DLT_LINUX_SLL2          1
 #define LINKTYPE_CAN_SOCKETCAN  227
-#define DLT_CAN_SOCKETCAN       227
+#define DLT_CAN_SOCKETCAN       2
 
 #define PCAP_SLL_PKT_LEN		32
 #define PCAP_SOCKETCAN_PKT_LEN  16
@@ -53,6 +53,9 @@ PACK__ struct PCAP_PACKET_RECORD_HEADER{
     uint32_t    len;
 }__PACK;
 
+/************************************ LINKTYPE'S ******************************************/
+/*********** LINKTYPE_LINUX_SLL 	113 	DLT_LINUX_SLL ****************/
+//https://www.tcpdump.org/linktypes/LINKTYPE_LINUX_SLL.html
 PACK__ struct PCAP_LINKTYPE_LINUX_SLL_HEADER {
     uint16_t    sll_pkttype;					/* packet type */
     uint16_t    sll_hatype;				        /* link-layer address type */
@@ -61,6 +64,8 @@ PACK__ struct PCAP_LINKTYPE_LINUX_SLL_HEADER {
     uint16_t    sll_protocol;					/* protocol */
 }__PACK;
 
+/*********** LINKTYPE_IPV4 	228 	DLT_IPV4 *******************************/
+//https://www.tcpdump.org/linktypes/LINKTYPE_CAN_SOCKETCAN.html
 PACK__ struct PCAP_LINKTYPE_CAN_SOCKETCAN {
     uint32_t    can_id;			        		/* can id */
     uint8_t     payload_length;;                /* payload length */
@@ -79,6 +84,10 @@ PACK__ struct SOCKETCAN_FRAME_HEADER {
     uint8_t    data[CAN_MAX_DLEN];
 }__PACK;
 
+/*********** LINKTYPE_LINUX_SLL2 	276 	DLT_LINUX_SLL2 *******************/
+//https://www.tcpdump.org/linktypes/LINKTYPE_LINUX_SLL2.html
+
+
 struct CAN_FRAME {
     uint32_t   can_id;
     uint8_t    can_ext;
@@ -87,10 +96,12 @@ struct CAN_FRAME {
 };
 
 uint32_t swap_endianness(uint32_t bytes, int bit);
-void init_pcap_file_header(struct PCAP_FILE_HEADER *pcap_global_fh, uint32_t dlt);
-struct PCAP_LINKTYPE_LINUX_SLL_HEADER init_sll_linktype_header(uint16_t pkttype);
-struct PCAP_LINKTYPE_CAN_SOCKETCAN init_socketcan_linktype_header(void);
-struct PCAP_PACKET_RECORD_HEADER init_pcap_pkt_header(uint32_t pkt_cap_len, uint32_t pkt_len);
+void pcap_prepare_file_header(struct PCAP_FILE_HEADER *pcap_global_fh, uint32_t dlt);
+struct PCAP_LINKTYPE_LINUX_SLL_HEADER pcap_prepare_sll_header(uint16_t pkttype);
+struct PCAP_LINKTYPE_CAN_SOCKETCAN pacap_prepare_socketcan_linktype_header(void);
+struct PCAP_LINKTYPE_LINUX_SLL_HEADER pcap_prepare_sll2_header(uint16_t pkttype);
+
+struct PCAP_PACKET_RECORD_HEADER pcap_prepare_pkt_header(uint32_t pkt_cap_len, uint32_t pkt_len);
 struct SOCKETCAN_FRAME_HEADER init_rnd_fake_can_header(void);
 struct PCAP_LINKTYPE_CAN_SOCKETCAN prepare_socketcan_linktype_from_canframe(struct CAN_FRAME *can_frame);
 

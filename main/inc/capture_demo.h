@@ -7,6 +7,6 @@
 
 #include "stdint.h"
 
-void capture_demo(char *fifo_name, struct INTERFACE_PARAMETERS *interface_parameters, int16_t interface);
+void capture_demo(char *fifo_name, struct INTERFACE_PARAMETERS interface_parameters);
 
 #endif //CAPTURE_H

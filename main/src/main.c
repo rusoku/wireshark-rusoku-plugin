@@ -30,7 +30,7 @@ https://munich.dissec.to/kb/chapters/can/can-socketcan.html
 */
 
 int main(int argc, char **argv) {
-    struct option options[GOPT_LAST_OPT+1];
+    struct option options[GOPT_LAST_OPT + 1];
     int16_t interface = -1;
     struct INTERFACE_PARAMETERS interface_parameters[8] = {};
     char *fifo_name;
@@ -103,8 +103,12 @@ int main(int argc, char **argv) {
     options[LOG_FILE].short_name = 'G';
     options[LOG_FILE].flags = GOPT_ARGUMENT_REQUIRED;
 
+    options[PARAMETER_DLT_LINKTYPE].long_name = "dlt_type";
+    options[PARAMETER_DLT_LINKTYPE].short_name = 'H';
+    options[PARAMETER_DLT_LINKTYPE].flags = GOPT_ARGUMENT_REQUIRED;
+
     options[CAPTURE].long_name = "capture";
-    options[CAPTURE].short_name = 'H';
+    options[CAPTURE].short_name = 'I';
     options[CAPTURE].flags = GOPT_ARGUMENT_FORBIDDEN;
 
     options[GOPT_LAST_OPT].flags = GOPT_LAST;
@@ -123,12 +127,12 @@ int main(int argc, char **argv) {
         for (int index = 0; index < comm_device_cnt; index++) {
             //printf("interface {value=%d}{display=Toucan CAN adapter interface %d - (RUSOKU TouCAN s/n: %s)}\n",
             printf("interface {value=%d}{display=%s CAN adapter interface %d - (%s %s s/n: %s)}\n",
-                    index,
-                    comm_devices[index].device_model_str,
-                    index,
-                    comm_devices[index].manufacturer_str,
-                    comm_devices[index].device_model_str,
-                    comm_devices[index].serial);
+                   index,
+                   comm_devices[index].device_model_str,
+                   index,
+                   comm_devices[index].manufacturer_str,
+                   comm_devices[index].device_model_str,
+                   comm_devices[index].serial);
         }
 
         //        printf("control {number=0}{type=string}{display=Msg ID}{tooltip=Custom frame message ID (0xNNNNNNNN)}{validation=^(([01][a-fA-F0-9]\\{0,7\\})|([a-fA-F0-9]\\{0,7\\}))$}\n");
@@ -144,12 +148,12 @@ int main(int argc, char **argv) {
     // extcap-interface
     if (options[EXTCAP_INTERFACE].count) {
         interface = (int32_t) strtoll(options[EXTCAP_INTERFACE].argument, NULL, 16);
+        interface_parameters[interface].interface_nr = interface;
     }
 
     //extcap-version
     if (options[EXTCAP_VERSION].count) {
-        //printf("extcap {version=1.0}{help=file:///Applications/Wireshark.app/Contents/Resources/share/wireshark/rusoku-wireshark-plugin.html}\n");
-        printf("extcap {version=0.0.1}{hel=https://www.rusoku.org}{display=RUSOKU CAN USB adapter extcap interface}\n");
+        printf("extcap {version=1.0}{hel=https://www.rusoku.com}{display=RUSOKU CAN USB adapter extcap interface}\n");
     }
 
     // extcap-config
@@ -168,13 +172,33 @@ int main(int argc, char **argv) {
             "arg {number=3}{call=--parameter_silent}{display=Silent}{tooltip=enable silent mode}{type=boolflag}{required=true}{default=false}\n");
         printf(
             "arg {number=4}{call=--parameter_loopback}{display=Loopback}{tooltip=enable loopback mode}{type=boolflag}{required=true}{default=false}\n");
+        printf(
+            "arg {number=5}{call=--dlt_type}{display=DLT_datalink_type}{tooltip=DLT linktype}{type=selector}{default=1}\n");
+
+        printf(
+            "value {arg=5}{value=0}{display=DLT_LINUX_SLL}\n");
+        printf(
+            "value {arg=5}{value=1}{display=DLT_CAN_SOCKETCAN}\n");
+        printf(
+            "value {arg=5}{value=2}{display=DLT_LINUX_SLL2}\n");
     }
 
     // extcap-dlts
     if (options[EXTCAP_DLTS].count) {
-        //printf("dlt {number=113}{name=DLT_LINUX_SLL}{display=TouCAN}\n");
-        //printf("dlt {number=147}{name=USER0}{display=Demo Implementation for Extcap}\n");
-        printf("dlt {number=227}{name=DLT_CAN_SOCKETCAN}{display=TouCAN}\n");
+        if (interface < 0 || interface > 7) {
+            exit(EXIT_FAILURE);
+        }
+        switch (interface_parameters[interface].dlt_type) {
+            case DLT_LINUX_SLL:
+                printf("dlt {number=113}{name=DLT_LINUX_SLL}{display=TouCAN}\n");
+                break;
+            case DLT_CAN_SOCKETCAN:
+                printf("dlt {number=227}{name=DLT_CAN_SOCKETCAN}{display=TouCAN}\n");
+                break;
+            case DLT_LINUX_SLL2:
+                printf("dlt {number=276}{name=DLT_LINUX_SLL2}{display=TouCAN}\n");
+                break;
+        }
     }
 
     //extcap-bitrate
@@ -192,7 +216,8 @@ int main(int argc, char **argv) {
             exit(EXIT_FAILURE);
         }
 
-        interface_parameters[interface].bitrate_data |= (int32_t) strtoll(options[PARAMETER_BITRATE_DATA].argument, NULL, 16);
+        interface_parameters[interface].bitrate_data |= (int32_t) strtoll(
+            options[PARAMETER_BITRATE_DATA].argument, NULL, 16);
     }
 
     //extcap-silent
@@ -228,6 +253,16 @@ int main(int argc, char **argv) {
         }
     }
 
+    //extcap-dlt_type
+    if (options[PARAMETER_DLT_LINKTYPE].count) {
+        if (interface < 0 || interface > 7) {
+            exit(EXIT_FAILURE);
+        }
+
+        interface_parameters[interface].dlt_type |= (int32_t) strtoll(options[PARAMETER_DLT_LINKTYPE].argument, NULL,
+                                                                      16);
+    }
+
     //fifo
     if (options[FIFO].count) {
         if (interface < 0 || interface > 7) {
@@ -242,11 +277,8 @@ int main(int argc, char **argv) {
             exit(EXIT_FAILURE);
         }
 
-        if (interface == 0) {
-            capture_demo(fifo_name, interface_parameters, interface);
-        } else {
-            capture(fifo_name, interface_parameters, interface);
-        }
+        //capture_demo(fifo_name, interface_parameters[interface & 7]);
+        capture(fifo_name, interface_parameters[interface & 7]);
     }
     return (EXIT_SUCCESS);
 }

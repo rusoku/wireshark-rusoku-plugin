@@ -44,8 +44,10 @@ uint32_t swap_endianness(uint32_t bytes, int bit) {
     return bytes;
 }
 
-void init_pcap_file_header(struct PCAP_FILE_HEADER *pcap_global_fh, uint32_t dlt) {
-    pcap_global_fh->magic = 0xA1B23C4D; //0xA1B2C3D4;
+/*********************************** PCAP file header ***************************************/
+//Prepare PCAP file header
+void pcap_prepare_file_header(struct PCAP_FILE_HEADER *pcap_global_fh, uint32_t dlt) {
+    pcap_global_fh->magic = 0xA1B23C4D; //0xA1B2C3D4; uS
     pcap_global_fh->version_major = 2;
     pcap_global_fh->version_minor = 4;
     pcap_global_fh->thiszone = 0;
@@ -55,7 +57,7 @@ void init_pcap_file_header(struct PCAP_FILE_HEADER *pcap_global_fh, uint32_t dlt
 }
 
 //struct PCAP_PACKET_RECORD_HEADER init_pcap_pkt_header(structCanalMsg *canal_frame, pcappkt_can *pcap_frame)
-struct PCAP_PACKET_RECORD_HEADER init_pcap_pkt_header(uint32_t pkt_cap_len, uint32_t pkt_len)
+struct PCAP_PACKET_RECORD_HEADER pcap_prepare_pkt_header(uint32_t pkt_cap_len, uint32_t pkt_len)
 {
     static struct PCAP_PACKET_RECORD_HEADER pcap_packet_header = {};
     struct timespec spec = {};
@@ -70,7 +72,7 @@ struct PCAP_PACKET_RECORD_HEADER init_pcap_pkt_header(uint32_t pkt_cap_len, uint
     return pcap_packet_header;
 }
 
-struct PCAP_LINKTYPE_LINUX_SLL_HEADER init_sll_header(uint16_t pkttype)
+struct PCAP_LINKTYPE_LINUX_SLL_HEADER pcap_prepare_sll_header(uint16_t pkttype)
 {
     static struct PCAP_LINKTYPE_LINUX_SLL_HEADER sll_header = {};
     sll_header.sll_pkttype = swap_endianness(pkttype, 16);
@@ -90,7 +92,7 @@ struct PCAP_LINKTYPE_LINUX_SLL_HEADER init_sll_header(uint16_t pkttype)
 //    uint8_t reserved2;  					/* reserved2 */
 //}__PACK;
 
-struct PCAP_LINKTYPE_CAN_SOCKETCAN init_socketcan_linktype_header(void)
+struct PCAP_LINKTYPE_CAN_SOCKETCAN pcap_prepare_socketcan_linktype_header(void)
 {
     static struct PCAP_LINKTYPE_CAN_SOCKETCAN socketcan_frame = {};
     socketcan_frame.can_id = swap_endianness(randRange(0x7FF), 0);// | swap_endianness(0x80000000, 0);

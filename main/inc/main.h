@@ -33,14 +33,17 @@
 #define EXTCAP_VERSION          14
 #define EXTCAP_CONFIG           15
 #define EXTCAP_DLTS             16
-#define CAPTURE                 17
-#define GOPT_LAST_OPT           18
+#define PARAMETER_DLT_LINKTYPE  17
+#define CAPTURE                 18
+#define GOPT_LAST_OPT           19
 
 #define INTERAFACE_PARAMETER_OPTION_SILENT     0x00000001L
 #define INTERAFACE_PARAMETER_OPTION_LOOPBACK   0x00000002L
 #define INTERAFACE_PARAMETER_OPTION_CANFD      0x00000004L
 
 struct INTERFACE_PARAMETERS {
+    int16_t interface_nr;
+    uint8_t dlt_type;
     char serial_str[16];
     uint32_t bitrate; //can bitrate
     uint32_t bitrate_data; //can fd bitrate
