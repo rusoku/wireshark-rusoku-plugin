@@ -17,6 +17,8 @@ CanalSend_fp CanalSend;
 CanalGetStatus_fp CanalGetStatus;
 
 static void *handler = NULL;
+static int64_t canal_handler;
+
 
 enum COMM_ERROR_CODES comm_init(char *error_code) {
     handler = dlopen("canal.dll", RTLD_LAZY);
@@ -70,29 +72,6 @@ enum COMM_ERROR_CODES comm_deinit(void) {
 };
 
 enum COMM_ERROR_CODES comm_get_device_list(struct COMM_DEVICE *comm_devices, uint32_t *num_devices) {
-    /*
-    struct CANAL_DEV_INFO {
-        uint16_t DeviceId;
-        uint16_t vid;
-        uint16_t pid;
-        char SerialNumber[16];
-    };
-
-    struct CANAL_DEV_LIST {
-        struct CANAL_DEV_INFO canDevInfo[CANAL_DEVLIST_SIZE_MAX];
-        uint16_t canDevCount;
-    };
-
-    typedef struct COMM_DEVICE {
-        uint16_t id;
-        enum COMM_MANUFACTURER manufacturer;
-        enum COMM_DEVICE_MODEL device_model;
-        char manufacturer_str[64];
-        char device_model_str[64];
-        char serial[16];
-    }COMM_DEVICES[8];
-  */
-
     if (comm_devices == NULL || num_devices == NULL) {
         return COMM_LIB_ERROR_NULL;
     }
@@ -117,6 +96,15 @@ enum COMM_ERROR_CODES comm_get_device_list(struct COMM_DEVICE *comm_devices, uin
         strcpy(comm_devices[index].device_model_str, MODEL_TOUCAN);
         comm_devices[index].id = index;
     }
+
+    return COMM_SUCCESS;
+}
+
+enum COMM_ERROR_CODES comm_open_device(COMM_DEV_HANDLE comm_dev_handle, char *dev_name) {
+    canal_handler = CanalOpen(dev_name, 0);
+
+    if (canal_handler < 0)
+        return COMM_DEVICE_OPEN_ERROR;
 
     return COMM_SUCCESS;
 }

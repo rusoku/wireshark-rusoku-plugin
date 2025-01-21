@@ -31,6 +31,7 @@ void capture(char *fifo_name, struct INTERFACE_PARAMETERS interface) {
     };
 
     FILE *fp;
+    char tmp_buffer[128];
     struct PCAP_FILE_HEADER pcap_file_header = {};
     struct PCAP_PACKET_RECORD_HEADER pcap_packet = {};
     struct PCAP_LINKTYPE_CAN_SOCKETCAN pcap_linktype_socketcan = {};
@@ -44,6 +45,12 @@ void capture(char *fifo_name, struct INTERFACE_PARAMETERS interface) {
     }
 
     strcpy(interface.serial_str, comm_devices[interface.interface_nr].serial);
+    sprintf(tmp_buffer, "0;%s;%d", interface.serial_str, interface.bitrate);
+    DebugPrintf(tmp_buffer);
+
+    if (comm_open_device(0, tmp_buffer) != COMM_SUCCESS) {
+        exit(EXIT_FAILURE);
+    }
 
     DebugPrintf("************** DEBUG **********************");
     DebugPrintf("capture:serial_nr=%s\n", interface.serial_str);
