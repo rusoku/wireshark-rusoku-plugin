@@ -8,11 +8,14 @@
 #include "../inc/capture_demo.h"
 #include "../inc/capture.h"
 #include "../inc/comm_base.h"
+#include "../inc/debug.h"
 
 #include <stdbool.h>
 
-void capture(char *fifo_name, struct INTERFACE_PARAMETERS interface_parameters) {
-    if (interface_parameters.interface_nr == -1)
+#include "../../rusoku/inc/comm_rusoku_win.h"
+
+void capture(char *fifo_name, struct INTERFACE_PARAMETERS interface) {
+    if (interface.interface_nr == -1)
         exit(EXIT_FAILURE);
 
     struct CAN_FRAME can_frame[] = {
@@ -35,9 +38,21 @@ void capture(char *fifo_name, struct INTERFACE_PARAMETERS interface_parameters) 
     fp = fopen(fifo_name, "wb");
     if (fp == NULL)
         exit(EXIT_FAILURE);
-    //setvbuf(fp, NULL, _IONBF, 0);
 
-    //switch ()
+    if (comm_get_device_list(comm_devices, &comm_device_cnt) != COMM_SUCCESS) {
+        exit(EXIT_FAILURE);
+    }
+
+    strcpy(interface.serial_str, comm_devices[interface.interface_nr].serial);
+
+    DebugPrintf("************** DEBUG **********************");
+    DebugPrintf("capture:serial_nr=%s\n", interface.serial_str);
+    DebugPrintf("capture:interface_nr=%ld\n", interface.interface_nr);
+    DebugPrintf("capture:dlt_type=%ld\n", interface.dlt_type);
+    DebugPrintf("capture:bitrate=%ld\n", interface.bitrate);
+    DebugPrintf("capture:bitrate_data=%ld\n", interface.bitrate_data);
+    DebugPrintf("capture:options=%08x\n", interface.options);
+    DebugPrintf("\n");
 
     pcap_prepare_file_header(&pcap_file_header, LINKTYPE_CAN_SOCKETCAN);
     fwrite(&pcap_file_header, sizeof(struct PCAP_FILE_HEADER), 1, fp);
@@ -53,7 +68,7 @@ void capture(char *fifo_name, struct INTERFACE_PARAMETERS interface_parameters) 
             fwrite(&pcap_linktype_socketcan, sizeof(struct PCAP_LINKTYPE_CAN_SOCKETCAN), 1, fp);
 
             fflush(fp);
-            usleep(1000);
+            usleep(10000);
         }
         //while (1)
         usleep(100000);

@@ -23,6 +23,8 @@ https://munich.dissec.to/kb/chapters/can/can-socketcan.html
 #include "../inc/comm_base.h"
 #include "../../rusoku/inc/comm_rusoku_win.h"
 
+#include "../inc/debug.h"
+
 /*
     ~/Library/Logs for user-oriented info from non-system software
     /Library/Logs for Mac-ish system-wide event logging
@@ -31,9 +33,21 @@ https://munich.dissec.to/kb/chapters/can/can-socketcan.html
 
 int main(int argc, char **argv) {
     struct option options[GOPT_LAST_OPT + 1];
-    int16_t interface = -1;
-    struct INTERFACE_PARAMETERS interface_parameters[8] = {};
+    int8_t interface = -1;
+    struct INTERFACE_PARAMETERS interface_parameters = {
+        .interface_nr = -1,
+        .dlt_type = 1,
+        .bitrate = 125,
+        .bitrate_data = 125,
+        .options = 0
+    };
     char *fifo_name;
+
+    //DebugPrintf("***begin***\n");
+    //for (int a = 1; a < argc; a++) {
+    //    DebugPrintf("%s ", argv[a]);
+    //}
+    //DebugPrintf("***end***\n");
 
     options[EXTCAP_INTERFACES].long_name = "extcap-interfaces";
     options[EXTCAP_INTERFACES].short_name = '0';
@@ -85,15 +99,15 @@ int main(int argc, char **argv) {
 
     options[PARAMETER_SILENT].long_name = "parameter_silent";
     options[PARAMETER_SILENT].short_name = 'C';
-    options[PARAMETER_SILENT].flags = GOPT_ARGUMENT_REQUIRED;
+    options[PARAMETER_SILENT].flags = GOPT_ARGUMENT_FORBIDDEN;
 
     options[PARAMETER_LOOPBACK].long_name = "parameter_loopback";
     options[PARAMETER_LOOPBACK].short_name = 'D';
-    options[PARAMETER_LOOPBACK].flags = GOPT_ARGUMENT_REQUIRED;
+    options[PARAMETER_LOOPBACK].flags = GOPT_ARGUMENT_FORBIDDEN;
 
     options[PARAMETER_CANFD].long_name = "parameter_canfd";
     options[PARAMETER_CANFD].short_name = 'E';
-    options[PARAMETER_CANFD].flags = GOPT_ARGUMENT_REQUIRED;
+    options[PARAMETER_CANFD].flags = GOPT_ARGUMENT_FORBIDDEN;
 
     options[LOG_LEVEL].long_name = "log-level";
     options[LOG_LEVEL].short_name = 'F';
@@ -120,12 +134,10 @@ int main(int argc, char **argv) {
         printf("extcap {version=1.0}{help=https://www.rusoku.org}{display=RUSOKU CAN USB adapter extcap interface}\n");
 
         if (comm_get_device_list(comm_devices, &comm_device_cnt) != COMM_SUCCESS) {
-            fprintf(stderr, "comm_get_device_list failed\n");
             exit(EXIT_FAILURE);
         }
 
-        for (int index = 0; index < comm_device_cnt; index++) {
-            //printf("interface {value=%d}{display=Toucan CAN adapter interface %d - (RUSOKU TouCAN s/n: %s)}\n",
+        for (int index = 0; index < (comm_device_cnt & 7); index++) {
             printf("interface {value=%d}{display=%s CAN adapter interface %d - (%s %s s/n: %s)}\n",
                    index,
                    comm_devices[index].device_model_str,
@@ -140,15 +152,13 @@ int main(int argc, char **argv) {
         //        printf("control {number=2}{type=boolean}{display=RTR}{tooltip=Request to Re-transmit}{default=false}\n");
         //        printf("control {number=3}{type=string}{display=Message}{tooltip=Custom message (0-8 bytes, space separated)}{validation=^([a-fA-F0-9]\\{0,2\\}(\\s)*)\\{0,8\\}$}\n");
         //        printf("control {number=4}{type=button}{display=Send}{tooltip=Send custom frame if values provided. If empty, sends a random frame}\n");
-
-        //printf("value {control=1}{value=0}{display=1 sec}");
-        //printf("value {control=1}{value=1}{display=2 sec}{default=true}");
+        exit(EXIT_SUCCESS);
     }
 
     // extcap-interface
     if (options[EXTCAP_INTERFACE].count) {
-        interface = (int32_t) strtoll(options[EXTCAP_INTERFACE].argument, NULL, 16);
-        interface_parameters[interface].interface_nr = interface;
+        interface = (int8_t) strtol(options[EXTCAP_INTERFACE].argument, NULL, 10);
+        interface_parameters.interface_nr = interface;
     }
 
     //extcap-version
@@ -158,23 +168,18 @@ int main(int argc, char **argv) {
 
     // extcap-config
     if (options[EXTCAP_CONFIG].count) {
-        if (interface < 0 || interface > 7) {
-            exit(EXIT_FAILURE);
-        }
-
         printf(
             "arg {number=0}{call=--parameter_canfd}{display=CAN FD mode}{tooltip=enable canfd mode}{type=boolflag}{required=true}{default=false}\n");
         printf(
-            "arg {number=1}{call=--parameter_bitrate}{display=Bitrate, kbps}{tooltip=Capture bitrate}{type=integer}{range=10,10000}{required=true}{default=125}\n");
+            "arg {number=1}{call=--parameter_silent}{display=Silent}{tooltip=enable silent mode}{type=boolflag}{required=true}{default=false}\n");
         printf(
-            "arg {number=2}{call=--parameter_bitrate}{display=Bitrate data, kbps}{tooltip=Capture bitrate data}{type=integer}{range=10,10000}{required=true}{default=125}\n");
+            "arg {number=2}{call=--parameter_loopback}{display=Loopback}{tooltip=enable loopback mode}{type=boolflag}{required=true}{default=false}\n");
         printf(
-            "arg {number=3}{call=--parameter_silent}{display=Silent}{tooltip=enable silent mode}{type=boolflag}{required=true}{default=false}\n");
+            "arg {number=3}{call=--parameter_bitrate}{display=Bitrate, kbps}{tooltip=Capture bitrate}{type=integer}{range=10,10000}{required=true}{default=125}\n");
         printf(
-            "arg {number=4}{call=--parameter_loopback}{display=Loopback}{tooltip=enable loopback mode}{type=boolflag}{required=true}{default=false}\n");
+            "arg {number=4}{call=--parameter_bitrate_data}{display=Bitrate data, kbps}{tooltip=Capture bitrate data}{type=integer}{range=10,10000}{required=true}{default=125}\n");
         printf(
             "arg {number=5}{call=--dlt_type}{display=DLT_datalink_type}{tooltip=DLT linktype}{type=selector}{default=1}\n");
-
         printf(
             "value {arg=5}{value=0}{display=DLT_LINUX_SLL}\n");
         printf(
@@ -185,10 +190,7 @@ int main(int argc, char **argv) {
 
     // extcap-dlts
     if (options[EXTCAP_DLTS].count) {
-        if (interface < 0 || interface > 7) {
-            exit(EXIT_FAILURE);
-        }
-        switch (interface_parameters[interface].dlt_type) {
+        switch (interface_parameters.dlt_type) {
             case DLT_LINUX_SLL:
                 printf("dlt {number=113}{name=DLT_LINUX_SLL}{display=TouCAN}\n");
                 break;
@@ -198,87 +200,76 @@ int main(int argc, char **argv) {
             case DLT_LINUX_SLL2:
                 printf("dlt {number=276}{name=DLT_LINUX_SLL2}{display=TouCAN}\n");
                 break;
+            default:
+                break;
         }
     }
 
     //extcap-bitrate
     if (options[PARAMETER_BITRATE].count) {
-        if (interface < 0 || interface > 7) {
-            exit(EXIT_FAILURE);
-        }
+        interface_parameters.bitrate = (int32_t) strtol(options[PARAMETER_BITRATE].argument, NULL, 10);
 
-        interface_parameters[interface].bitrate |= (int32_t) strtoll(options[PARAMETER_BITRATE].argument, NULL, 16);
+        //DebugPrintf("main:bitrate=%s\n", options[PARAMETER_BITRATE].argument);
     }
 
     //extcap-bitrate-data
     if (options[PARAMETER_BITRATE_DATA].count) {
-        if (interface < 0 || interface > 7) {
-            exit(EXIT_FAILURE);
-        }
+        interface_parameters.bitrate_data = (int32_t) strtol(options[PARAMETER_BITRATE_DATA].argument, NULL, 10);
 
-        interface_parameters[interface].bitrate_data |= (int32_t) strtoll(
-            options[PARAMETER_BITRATE_DATA].argument, NULL, 16);
+        //DebugPrintf("main:bitrate_data=%s\n", options[PARAMETER_BITRATE_DATA].argument);
     }
 
     //extcap-silent
     if (options[PARAMETER_SILENT].count) {
-        if (interface < 0 || interface > 7) {
-            exit(EXIT_FAILURE);
-        }
+        //DebugPrintf("main:silent=%d\n", strtol(options[PARAMETER_SILENT].argument, NULL, 10));
+        //DebugPrintf("main:silent=%s\n", options[PARAMETER_SILENT].argument);
 
-        if ((int32_t) strtoll(options[PARAMETER_SILENT].argument, NULL, 16)) {
-            interface_parameters[interface].options |= INTERAFACE_PARAMETER_OPTION_SILENT;
-        }
+        //if ((int32_t) strtol(options[PARAMETER_SILENT].argument, NULL, 2)) {
+        interface_parameters.options |= INTERFACE_PARAMETER_OPTION_SILENT;
+        //}
     }
 
     //extcap-loopback
     if (options[PARAMETER_LOOPBACK].count) {
-        if (interface < 0 || interface > 7) {
-            exit(EXIT_FAILURE);
-        }
-
-        if ((int32_t) strtoll(options[PARAMETER_LOOPBACK].argument, NULL, 16)) {
-            interface_parameters[interface].options |= INTERAFACE_PARAMETER_OPTION_LOOPBACK;
-        }
+        //DebugPrintf("main:loopback=%s\n", options[PARAMETER_LOOPBACK].argument);
+        //if ((int32_t) strtol(options[PARAMETER_LOOPBACK].argument, NULL, 2)) {
+            interface_parameters.options |= INTERFACE_PARAMETER_OPTION_LOOPBACK;
+        //}
     }
 
     //extcap-canfd
     if (options[PARAMETER_CANFD].count) {
-        if (interface < 0 || interface > 7) {
-            exit(EXIT_FAILURE);
-        }
-
-        if ((int32_t) strtoll(options[PARAMETER_CANFD].argument, NULL, 16)) {
-            interface_parameters[interface].options |= INTERAFACE_PARAMETER_OPTION_CANFD;
-        }
+        //DebugPrintf("main:canfd=%s\n", options[PARAMETER_CANFD].argument);
+        //if ((int32_t) strtol(options[PARAMETER_CANFD].argument, NULL, 2)) {
+            interface_parameters.options |= INTERFACE_PARAMETER_OPTION_CANFD;
+        //}
     }
 
     //extcap-dlt_type
     if (options[PARAMETER_DLT_LINKTYPE].count) {
-        if (interface < 0 || interface > 7) {
-            exit(EXIT_FAILURE);
-        }
-
-        interface_parameters[interface].dlt_type |= (int32_t) strtoll(options[PARAMETER_DLT_LINKTYPE].argument, NULL,
-                                                                      16);
+        interface_parameters.dlt_type = (int8_t) strtol(options[PARAMETER_DLT_LINKTYPE].argument, NULL,
+                                                        10);
     }
 
     //fifo
     if (options[FIFO].count) {
-        if (interface < 0 || interface > 7) {
-            exit(EXIT_FAILURE);
-        }
         fifo_name = options[FIFO].argument;
     }
 
     //capture
     if (options[CAPTURE].count) {
-        if (interface < 0 || interface > 7) {
-            exit(EXIT_FAILURE);
-        }
-
+        /*
+                struct INTERFACE_PARAMETERS {
+                    int8_t interface_nr;
+                    uint8_t dlt_type;
+                    char serial_str[16];
+                    uint32_t bitrate; //can bitrate
+                    uint32_t bitrate_data; //can fd bitrate
+                    uint32_t options; //silent, loopbach, canfd, etc.
+                };
+        */
         //capture_demo(fifo_name, interface_parameters[interface & 7]);
-        capture(fifo_name, interface_parameters[interface & 7]);
+        capture(fifo_name, interface_parameters);
     }
     return (EXIT_SUCCESS);
 }

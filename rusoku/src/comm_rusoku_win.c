@@ -5,7 +5,6 @@
 #include "../../main/inc/comm_base.h"
 #include "../inc/comm_rusoku_win.h"
 
-struct COMM_DEVICE comm_devices[8] = {};
 uint32_t comm_device_cnt = 0;
 
 CanalOpen_fp CanalOpen;

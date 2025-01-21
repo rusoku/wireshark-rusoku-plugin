@@ -18,6 +18,8 @@ set(SOURCES
         src/comm_base.c
         inc/comm_base.h
         src/main.c
+        src/debug.c
+        inc/debug.h
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

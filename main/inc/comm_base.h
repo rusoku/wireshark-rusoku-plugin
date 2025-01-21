@@ -63,6 +63,8 @@ struct COMM_CAN_MSG {
     uint8_t data[64];
 };
 
+extern struct COMM_DEVICE comm_devices[];
+
 typedef uint32_t COMM_DEV_HANDLE;
 
 enum COMM_ERROR_CODES comm_init(char *error_code);

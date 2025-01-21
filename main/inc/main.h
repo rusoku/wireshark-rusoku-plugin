@@ -5,6 +5,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -37,17 +38,19 @@
 #define CAPTURE                 18
 #define GOPT_LAST_OPT           19
 
-#define INTERAFACE_PARAMETER_OPTION_SILENT     0x00000001L
-#define INTERAFACE_PARAMETER_OPTION_LOOPBACK   0x00000002L
-#define INTERAFACE_PARAMETER_OPTION_CANFD      0x00000004L
+#define INTERFACE_PARAMETER_OPTION_SILENT     0x00000001L
+#define INTERFACE_PARAMETER_OPTION_LOOPBACK   0x00000002L
+#define INTERFACE_PARAMETER_OPTION_CANFD      0x00000004L
 
 struct INTERFACE_PARAMETERS {
-    int16_t interface_nr;
+    int8_t interface_nr;
     uint8_t dlt_type;
     char serial_str[16];
     uint32_t bitrate; //can bitrate
     uint32_t bitrate_data; //can fd bitrate
     uint32_t options; //silent, loopbach, canfd, etc.
 };
+
+//extern FILE *fpdebug;
 
 #endif //MAIN_H
