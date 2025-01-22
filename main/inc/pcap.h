@@ -5,7 +5,7 @@
 #ifndef PCAP_H
 #define PCAP_H
 
-#include "../inc/main.h"
+#include "main.h"
 
 #define LINKTYPE_LINUX_SLL      113
 #define DLT_LINUX_SLL           0

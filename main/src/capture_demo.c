@@ -5,9 +5,6 @@
 #include "../inc/main.h"
 #include "../inc/pcap.h"
 #include "../inc/capture_demo.h"
-#include "../inc/comm_base.h"
-
-#include <stdbool.h>
 
 void capture_demo(char *fifo_name, struct INTERFACE_PARAMETERS interface_parameters) {
     if (interface_parameters.interface_nr == -1)

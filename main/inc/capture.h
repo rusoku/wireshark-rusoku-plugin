@@ -6,8 +6,9 @@
 #define CAPTURE_H
 
 #include "stdint.h"
+#include "signal.h"
 
-void capture(char *fifo_name, struct INTERFACE_PARAMETERS interface_parameters);
+void capture(struct INTERFACE_PARAMETERS interface_parameters);
 
 
 #endif //CAPTURE_H

@@ -9,13 +9,29 @@
 #include "../inc/capture.h"
 #include "../inc/comm_base.h"
 #include "../inc/debug.h"
+#include <signal.h>
 
 #include <stdbool.h>
+#include <windows.h>
+#include "../inc/control_packet.h"
 
 #include "../../rusoku/inc/comm_rusoku_win.h"
 
-void capture(char *fifo_name, struct INTERFACE_PARAMETERS interface) {
-    if (interface.interface_nr == -1)
+#ifdef _WIN32
+static BOOL WINAPI
+sighandler(uint64_t dwCtrlType)
+#else
+static void sighandler(int signo)
+#endif
+{
+    onCapture = 0;
+    comm_close_device(0, interface_parameters);
+    exit(EXIT_FAILURE);
+}
+
+/******************** capture *************************/
+void capture(struct INTERFACE_PARAMETERS interface_par) {
+    if (interface_par.interface_nr == -1)
         exit(EXIT_FAILURE);
 
     struct CAN_FRAME can_frame[] = {
@@ -30,54 +46,73 @@ void capture(char *fifo_name, struct INTERFACE_PARAMETERS interface) {
         {0x7E8, 0, 8, 0x21, 0, 0, 0xAE, 0, 0, 0, 0}
     };
 
-    FILE *fp;
-    char tmp_buffer[128];
+    FILE *fp_data = NULL;
+    FILE *fp_ctrl_out = NULL;
+    FILE *fp_ctrl_in = NULL;
+    pthread_t control_thread_in, control_thread_out;
     struct PCAP_FILE_HEADER pcap_file_header = {};
     struct PCAP_PACKET_RECORD_HEADER pcap_packet = {};
     struct PCAP_LINKTYPE_CAN_SOCKETCAN pcap_linktype_socketcan = {};
 
-    fp = fopen(fifo_name, "wb");
-    if (fp == NULL)
+    fp_data = fopen(interface_parameters.fifo_data, "wb");
+    if (fp_data == NULL)
         exit(EXIT_FAILURE);
 
-    if (comm_get_device_list(comm_devices, &comm_device_cnt) != COMM_SUCCESS) {
+    //ws-to-ext
+    fp_ctrl_in = fopen(interface_parameters.fifo_cntrl_in, "rb");
+    if (fp_ctrl_in == NULL)
+        exit(EXIT_FAILURE);
+
+    //ext-to-ws
+    fp_ctrl_out = fopen(interface_parameters.fifo_cntrl_out, "wb");
+    if (fp_ctrl_out == NULL)
+        exit(EXIT_FAILURE);
+
+    //*** control threads ****
+    pthread_create(&control_thread_in, NULL, ctrl_read_thread, (void*)fp_ctrl_in);
+
+#ifdef _WIN32
+    SetConsoleCtrlHandler((PHANDLER_ROUTINE) sighandler, true);
+#else
+    if (signal(SIGTERM, sighandler) == SIG_ERR)
+        exit(EXIT_FAILURE);
+
+    if (signal(SIGINT, sighandler) == SIG_ERR)
+        exit(EXIT_FAILURE);
+#endif
+
+    if (comm_open_device(0, interface_parameters) != COMM_SUCCESS) {
         exit(EXIT_FAILURE);
     }
 
-    strcpy(interface.serial_str, comm_devices[interface.interface_nr].serial);
-    sprintf(tmp_buffer, "0;%s;%d", interface.serial_str, interface.bitrate);
-    DebugPrintf(tmp_buffer);
-
-    if (comm_open_device(0, tmp_buffer) != COMM_SUCCESS) {
-        exit(EXIT_FAILURE);
-    }
-
-    DebugPrintf("************** DEBUG **********************");
-    DebugPrintf("capture:serial_nr=%s\n", interface.serial_str);
-    DebugPrintf("capture:interface_nr=%ld\n", interface.interface_nr);
-    DebugPrintf("capture:dlt_type=%ld\n", interface.dlt_type);
-    DebugPrintf("capture:bitrate=%ld\n", interface.bitrate);
-    DebugPrintf("capture:bitrate_data=%ld\n", interface.bitrate_data);
-    DebugPrintf("capture:options=%08x\n", interface.options);
-    DebugPrintf("\n");
+    //DebugPrintf("************** DEBUG **********************");
+    //DebugPrintf("capture:serial_nr=%s\n", interface.serial_str);
+    //DebugPrintf("capture:interface_nr=%ld\n", interface.interface_nr);
+    //DebugPrintf("capture:dlt_type=%ld\n", interface.dlt_type);
+    //DebugPrintf("capture:bitrate=%ld\n", interface.bitrate);
+    //DebugPrintf("capture:bitrate_data=%ld\n", interface.bitrate_data);
+    //DebugPrintf("capture:options=%08x\n", interface.options);
+    //DebugPrintf("\n");
 
     pcap_prepare_file_header(&pcap_file_header, LINKTYPE_CAN_SOCKETCAN);
-    fwrite(&pcap_file_header, sizeof(struct PCAP_FILE_HEADER), 1, fp);
-    fflush(fp);
+    fwrite(&pcap_file_header, sizeof(struct PCAP_FILE_HEADER), 1, fp_data);
+    fflush(fp_data);
 
-    while (1) {
+    while (onCapture) {
         for (uint32_t x = 0; x <= sizeof(sizeof(can_frame) / sizeof(can_frame[0])); x++) {
             pcap_packet = pcap_prepare_pkt_header(PCAP_SOCKETCAN_PKT_LEN, PCAP_SOCKETCAN_PKT_LEN);
-            fwrite(&pcap_packet, sizeof(struct PCAP_PACKET_RECORD_HEADER), 1, fp);
+            fwrite(&pcap_packet, sizeof(struct PCAP_PACKET_RECORD_HEADER), 1, fp_data);
 
             //pcap_linktype_socketcan = init_socketcan_linktype_header();
             pcap_linktype_socketcan = prepare_socketcan_linktype_from_canframe(&can_frame[x]);
-            fwrite(&pcap_linktype_socketcan, sizeof(struct PCAP_LINKTYPE_CAN_SOCKETCAN), 1, fp);
+            fwrite(&pcap_linktype_socketcan, sizeof(struct PCAP_LINKTYPE_CAN_SOCKETCAN), 1, fp_data);
 
-            fflush(fp);
+            fflush(fp_data);
             usleep(10000);
         }
         //while (1)
-        usleep(100000);
+        //usleep(100000);
     }
+    comm_close_device(0, interface_parameters);
 }
+

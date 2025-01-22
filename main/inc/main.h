@@ -5,7 +5,6 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -13,9 +12,9 @@
 #include <time.h>
 #include <stdint.h>
 #include <dlfcn.h>
-
+#include <pthread.h>
 #include "pcap.h"
-#include "control_packet_headers.h"
+#include "debug.h"
 
 #define EXTCAP_INTERFACE        0
 #define EXTCAP_CAPTURE_FILTER   1
@@ -49,7 +48,14 @@ struct INTERFACE_PARAMETERS {
     uint32_t bitrate; //can bitrate
     uint32_t bitrate_data; //can fd bitrate
     uint32_t options; //silent, loopbach, canfd, etc.
+    char *fifo_data;
+    char *fifo_cntrl_out;
+    char *fifo_cntrl_in;
 };
+
+extern struct INTERFACE_PARAMETERS interface_parameters;
+extern int8_t interface;
+extern uint8_t onCapture;
 
 //extern FILE *fpdebug;
 

@@ -5,6 +5,8 @@
 #include "../../main/inc/comm_base.h"
 #include "../inc/comm_rusoku_win.h"
 
+#include "../../main/inc/debug.h"
+
 uint32_t comm_device_cnt = 0;
 
 CanalOpen_fp CanalOpen;
@@ -17,8 +19,7 @@ CanalSend_fp CanalSend;
 CanalGetStatus_fp CanalGetStatus;
 
 static void *handler = NULL;
-static int64_t canal_handler;
-
+static int64_t canal_handler = -1;
 
 enum COMM_ERROR_CODES comm_init(char *error_code) {
     handler = dlopen("canal.dll", RTLD_LAZY);
@@ -100,11 +101,29 @@ enum COMM_ERROR_CODES comm_get_device_list(struct COMM_DEVICE *comm_devices, uin
     return COMM_SUCCESS;
 }
 
-enum COMM_ERROR_CODES comm_open_device(COMM_DEV_HANDLE comm_dev_handle, char *dev_name) {
-    canal_handler = CanalOpen(dev_name, 0);
+enum COMM_ERROR_CODES comm_open_device(COMM_DEV_HANDLE dev_handle, struct INTERFACE_PARAMETERS interface) {
+    char tmp_buffer[128];
 
-    if (canal_handler < 0)
-        return COMM_DEVICE_OPEN_ERROR;
+    if (comm_get_device_list(comm_devices, &comm_device_cnt) != COMM_SUCCESS) {
+        return COMM_DEVICE_INIT_ERROR;
+    }
+
+    strcpy(interface.serial_str, comm_devices[interface.interface_nr].serial);
+    sprintf(tmp_buffer, "0;%s;%d", interface.serial_str, interface.bitrate);
+    canal_handler = CanalOpen(tmp_buffer, 0);
+    if (canal_handler < 0) {
+        return COMM_DEVICE_INIT_ERROR;
+    }
+
+    return COMM_SUCCESS;
+}
+
+enum COMM_ERROR_CODES comm_close_device(COMM_DEV_HANDLE dev_handle, struct INTERFACE_PARAMETERS interface) {
+    if (canal_handler < 0) {
+        return COMM_DEVICE_INIT_ERROR;
+    }
+
+    CanalClose(canal_handler);
 
     return COMM_SUCCESS;
 }

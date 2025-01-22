@@ -9,7 +9,6 @@ set(SOURCES
         inc/gopt.h
         inc/main.h
         inc/pcap.h
-        inc/control_packet_headers.h
         src/pcap.c
         src/capture_demo.c
         inc/capture_demo.h
@@ -20,6 +19,8 @@ set(SOURCES
         src/main.c
         src/debug.c
         inc/debug.h
+        src/control_packet.c
+        inc/control_packet.h
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

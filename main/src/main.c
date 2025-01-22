@@ -31,23 +31,19 @@ https://munich.dissec.to/kb/chapters/can/can-socketcan.html
     /var/log for Unix-ish system-wide event logging
 */
 
+uint8_t onCapture = 0;
+int8_t interface = -1;
+struct INTERFACE_PARAMETERS interface_parameters = {
+    .interface_nr = -1,
+    .dlt_type = 1,
+    .bitrate = 125,
+    .bitrate_data = 125,
+    .options = 0
+};
+
 int main(int argc, char **argv) {
     struct option options[GOPT_LAST_OPT + 1];
-    int8_t interface = -1;
-    struct INTERFACE_PARAMETERS interface_parameters = {
-        .interface_nr = -1,
-        .dlt_type = 1,
-        .bitrate = 125,
-        .bitrate_data = 125,
-        .options = 0
-    };
-    char *fifo_name;
 
-    //DebugPrintf("***begin***\n");
-    //for (int a = 1; a < argc; a++) {
-    //    DebugPrintf("%s ", argv[a]);
-    //}
-    //DebugPrintf("***end***\n");
 
     options[EXTCAP_INTERFACES].long_name = "extcap-interfaces";
     options[EXTCAP_INTERFACES].short_name = '0';
@@ -147,11 +143,16 @@ int main(int argc, char **argv) {
                    comm_devices[index].serial);
         }
 
-        //        printf("control {number=0}{type=string}{display=Msg ID}{tooltip=Custom frame message ID (0xNNNNNNNN)}{validation=^(([01][a-fA-F0-9]\\{0,7\\})|([a-fA-F0-9]\\{0,7\\}))$}\n");
-        //        printf("control {number=1}{type=boolean}{display=Extended}{tooltip=Extended CAN frame}{default=true}\n");
-        //        printf("control {number=2}{type=boolean}{display=RTR}{tooltip=Request to Re-transmit}{default=false}\n");
-        //        printf("control {number=3}{type=string}{display=Message}{tooltip=Custom message (0-8 bytes, space separated)}{validation=^([a-fA-F0-9]\\{0,2\\}(\\s)*)\\{0,8\\}$}\n");
-        //        printf("control {number=4}{type=button}{display=Send}{tooltip=Send custom frame if values provided. If empty, sends a random frame}\n");
+        printf(
+            "control {number=0}{type=string}{display=Msg ID}{tooltip=Custom frame message ID (0xNNNNNNNN)}{validation=^(([01][a-fA-F0-9]\\{0,7\\})|([a-fA-F0-9]\\{0,7\\}))$}\n");
+        printf(
+            "control {number=1}{type=boolean}{display=Extended}{tooltip=Extended CAN frame}{default=false}\n");
+        printf(
+            "control {number=2}{type=boolean}{display=RTR}{tooltip=Request to Re-transmit}{default=false}\n");
+        printf(
+            "control {number=3}{type=string}{display=Message}{tooltip=Custom message (0-8 bytes, space separated)}{validation=^([a-fA-F0-9]\\{0,2\\}(\\s)*)\\{0,8\\}$}\n");
+        printf(
+            "control {number=4}{type=button}{display=Send}{tooltip=Send custom frame if values provided. If empty, sends a random frame}\n");
         exit(EXIT_SUCCESS);
     }
 
@@ -205,44 +206,43 @@ int main(int argc, char **argv) {
         }
     }
 
+    //extcap-control-in, ws-to-ext
+    if (options[EXTCAP_CONTROL_IN].count) {
+        interface_parameters.fifo_cntrl_in = options[EXTCAP_CONTROL_IN].argument;
+        DebugPrintf("main:fifo_cntrl_in=%s\n", options[EXTCAP_CONTROL_IN].argument);
+    }
+
+    //extcap-control-out, ext-to-ws
+    if (options[EXTCAP_CONTROL_OUT].count) {
+        interface_parameters.fifo_cntrl_out = options[EXTCAP_CONTROL_OUT].argument;
+        DebugPrintf("main:fifo_cntrl_out=%s\n", options[EXTCAP_CONTROL_OUT].argument);
+    }
+
     //extcap-bitrate
     if (options[PARAMETER_BITRATE].count) {
         interface_parameters.bitrate = (int32_t) strtol(options[PARAMETER_BITRATE].argument, NULL, 10);
-
         //DebugPrintf("main:bitrate=%s\n", options[PARAMETER_BITRATE].argument);
     }
 
     //extcap-bitrate-data
     if (options[PARAMETER_BITRATE_DATA].count) {
         interface_parameters.bitrate_data = (int32_t) strtol(options[PARAMETER_BITRATE_DATA].argument, NULL, 10);
-
         //DebugPrintf("main:bitrate_data=%s\n", options[PARAMETER_BITRATE_DATA].argument);
     }
 
     //extcap-silent
     if (options[PARAMETER_SILENT].count) {
-        //DebugPrintf("main:silent=%d\n", strtol(options[PARAMETER_SILENT].argument, NULL, 10));
-        //DebugPrintf("main:silent=%s\n", options[PARAMETER_SILENT].argument);
-
-        //if ((int32_t) strtol(options[PARAMETER_SILENT].argument, NULL, 2)) {
         interface_parameters.options |= INTERFACE_PARAMETER_OPTION_SILENT;
-        //}
     }
 
     //extcap-loopback
     if (options[PARAMETER_LOOPBACK].count) {
-        //DebugPrintf("main:loopback=%s\n", options[PARAMETER_LOOPBACK].argument);
-        //if ((int32_t) strtol(options[PARAMETER_LOOPBACK].argument, NULL, 2)) {
-            interface_parameters.options |= INTERFACE_PARAMETER_OPTION_LOOPBACK;
-        //}
+        interface_parameters.options |= INTERFACE_PARAMETER_OPTION_LOOPBACK;
     }
 
     //extcap-canfd
     if (options[PARAMETER_CANFD].count) {
-        //DebugPrintf("main:canfd=%s\n", options[PARAMETER_CANFD].argument);
-        //if ((int32_t) strtol(options[PARAMETER_CANFD].argument, NULL, 2)) {
-            interface_parameters.options |= INTERFACE_PARAMETER_OPTION_CANFD;
-        //}
+        interface_parameters.options |= INTERFACE_PARAMETER_OPTION_CANFD;
     }
 
     //extcap-dlt_type
@@ -253,23 +253,13 @@ int main(int argc, char **argv) {
 
     //fifo
     if (options[FIFO].count) {
-        fifo_name = options[FIFO].argument;
+        interface_parameters.fifo_data = options[FIFO].argument;
     }
 
     //capture
     if (options[CAPTURE].count) {
-        /*
-                struct INTERFACE_PARAMETERS {
-                    int8_t interface_nr;
-                    uint8_t dlt_type;
-                    char serial_str[16];
-                    uint32_t bitrate; //can bitrate
-                    uint32_t bitrate_data; //can fd bitrate
-                    uint32_t options; //silent, loopbach, canfd, etc.
-                };
-        */
-        //capture_demo(fifo_name, interface_parameters[interface & 7]);
-        capture(fifo_name, interface_parameters);
+        onCapture = 1;
+        capture(interface_parameters);
     }
     return (EXIT_SUCCESS);
 }
