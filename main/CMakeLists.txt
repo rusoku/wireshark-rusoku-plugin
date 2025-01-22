@@ -41,7 +41,7 @@ elseif(APPLE)
     set(RPATH /usr/local/lib)
     set_target_properties(${PROJECT_NAME}
             PROPERTIES
-            LINK_FLAGS "-Wl,-rpath ${RPATH}"
+            LINK_FLAGS "-Wl,-rpath ${RPATH} -Wunknown-escape-sequence"
     )
 elseif(UNIX)
     message("OS:unix")

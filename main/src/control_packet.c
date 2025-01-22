@@ -10,13 +10,13 @@ void *ctrl_read_thread(void *ptr) {
     ctrl_in = (FILE *) ptr;
     struct CONTROL_PACKET_HEADERS *ctrl_packet_header;
     uint32_t payload_length;
+    uint32_t read_len, file_size;;
+    uint8_t buff[1024];
 
-    uint8_t buff_ctrl_header[6];
-    uint8_t buff_ctrl_payload[1024];
-    ctrl_packet_header = (struct CONTROL_PACKET_HEADERS *) buff_ctrl_header;
+    ctrl_packet_header = (struct CONTROL_PACKET_HEADERS *) buff;
 
     while (onCapture) {
-        fread(buff_ctrl_header, 1, sizeof(buff_ctrl_header), ctrl_in);
+        read_len = fread(buff, 1, 6, ctrl_in);
 
         DebugPrintf("************** CONTROL PACKET **********************");
         DebugPrintf("control:Sync Pipe Indication=%C\n", ctrl_packet_header->sync);
@@ -26,11 +26,17 @@ void *ctrl_read_thread(void *ptr) {
         DebugPrintf("control:CtlrNumber=%d\n", ctrl_packet_header->ctrl_number);
         DebugPrintf("control:Command=%d\n", ctrl_packet_header->command);
 
-        payload_length = (((ctrl_packet_header->len[2]) | (ctrl_packet_header->len[1] << 8) | (
-                              ctrl_packet_header->len[0] << 16)) - 2);
+        //payload_length = (ctrl_packet_header->len[1] << 16 | ctrl_packet_header->len[1] << 8 | ctrl_packet_header->len[2]);
+        payload_length = ctrl_packet_header->len[2];
+        payload_length -= 2;
 
-        DebugPrintf("control:PAYLOAD_LENGTH=%d\n", payload_length);
+        if (payload_length != 0) {
+            read_len = fread(buff, 1, payload_length, ctrl_in);
+            //DebugPrintf("control:data=%d %d %d%", buff[0], buff[1], buff[2], buff[3]);
+            DebugPrintf("control:data=%d", buff[0]);
+        }
     }
+
     DebugPrintf("control:RETURN");
     return NULL;
 }
