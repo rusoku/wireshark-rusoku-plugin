@@ -70,6 +70,7 @@ void capture(struct INTERFACE_PARAMETERS interface_par) {
 
     //*** control threads ****
     pthread_create(&control_thread_in, NULL, ctrl_read_thread, (void*)fp_ctrl_in);
+    pthread_create(&control_thread_out, NULL, ctrl_send_thread, (void*)fp_ctrl_out);
 
 #ifdef _WIN32
     SetConsoleCtrlHandler((PHANDLER_ROUTINE) sighandler, true);

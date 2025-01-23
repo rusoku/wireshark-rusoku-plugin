@@ -35,5 +35,6 @@ PACK__ struct CONTROL_PACKET_HEADERS {
 }__PACK;;
 
 void *ctrl_read_thread(void *ptr);
+void *ctrl_send_thread(void *ptr);
 
 #endif //CONTROL_PACKET_H

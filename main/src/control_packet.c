@@ -40,3 +40,13 @@ void *ctrl_read_thread(void *ptr) {
     DebugPrintf("control:RETURN");
     return NULL;
 }
+
+void *ctrl_send_thread(void *ptr) {
+    FILE *ctrl_out;
+    ctrl_out = (FILE *) ptr;
+
+
+
+    DebugPrintf("control:RETURN");
+    return NULL;
+}
