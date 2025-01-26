@@ -16,6 +16,7 @@
 #include "pcap.h"
 #include "debug.h"
 
+#define PCAP_TOTAL_DEVICES      8
 #define EXTCAP_INTERFACE        0
 #define EXTCAP_CAPTURE_FILTER   1
 #define FIFO                    2

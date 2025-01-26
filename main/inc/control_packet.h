@@ -18,6 +18,18 @@
 #define CTRL_CMD_WARNING	 8
 #define CTRL_CMD_ERROR		 9
 
+#define CONTROL_0  0
+#define CONTROL_1  1
+#define CONTROL_2  2
+#define CONTROL_3  3
+#define CONTROL_4  4
+#define CONTROL_5  5
+#define CONTROL_6  6
+#define CONTROL_7  7
+#define CONTROL_8  8
+#define CONTROL_9  9
+#define CONTROL_10 10
+
 #ifdef __GNUC__
 #define PACK__
 #define __PACK __attribute__((__packed__))

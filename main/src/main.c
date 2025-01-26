@@ -44,7 +44,6 @@ struct INTERFACE_PARAMETERS interface_parameters = {
 int main(int argc, char **argv) {
     struct option options[GOPT_LAST_OPT + 1];
 
-
     options[EXTCAP_INTERFACES].long_name = "extcap-interfaces";
     options[EXTCAP_INTERFACES].short_name = '0';
     options[EXTCAP_INTERFACES].flags = GOPT_ARGUMENT_FORBIDDEN;
@@ -127,7 +126,8 @@ int main(int argc, char **argv) {
 
     // extcap-interfaces
     if (options[EXTCAP_INTERFACES].count) {
-        printf("extcap {version=1.0}{help=https://www.rusoku.org}{display=RUSOKU CAN USB adapter extcap interface}\n");
+        printf(
+            "extcap {version=0.1.0}{help=https://www.rusoku.org}{display=RUSOKU CAN USB adapter extcap interface}\n");
 
         if (comm_get_device_list(comm_devices, &comm_device_cnt) != COMM_SUCCESS) {
             exit(EXIT_FAILURE);
@@ -143,11 +143,13 @@ int main(int argc, char **argv) {
                    comm_devices[index].serial);
         }
 
-        printf("control {number=0}{type=string}{display=Msg ID}{tooltip=Custom frame message ID (0xNNNNNNNN)}{validation=^(([01][a-fA-F0-9]{0,7})|([a-fA-F0-9]{0,7}))$}\n");
-        printf("control {number=1}{type=boolean}{display=Extended}{tooltip=Extended CAN frame}{default=true}\n");
-        printf("control {number=2}{type=boolean}{display=RTR}{tooltip=Request to Re-transmit}{default=false}\n");
-        printf("control {number=3}{type=string}{display=Message}{tooltip=Custom message (0-8 bytes, space separated)}{validation=^([a-fA-F0-9]{0,2}(s)*){0,8}$}\n");
-        printf("control {number=4}{type=button}{display=Send}{tooltip=Send custom frame if values provided. If empty, sends a random frame}\n");
+        printf(
+            "control {number=0}{type=string}{display=Msg ID}{tooltip=Custom frame message ID (0xNNNNNNNN)}{validation=^(([01][a-fA-F0-9]{0,7})|([a-fA-F0-9]{0,7}))$}\n");
+        printf("control {number=1}{type=boolean}{display=Extended}{tooltip=Extended CAN frame}{default=false}\n");
+        printf(
+            "control {number=2}{type=string}{display=Message}{tooltip=Custom message (0-8 bytes, space separated)}{validation=^([a-fA-F0-9]{0,2}(s)*){0,8}$}\n");
+        printf(
+            "control {number=3}{type=button}{display=Send}{tooltip=Send custom frame if values provided. If empty, sends a random frame}\n");
 
 
         exit(EXIT_SUCCESS);

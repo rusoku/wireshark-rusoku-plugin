@@ -53,6 +53,13 @@ extern uint32_t comm_device_cnt;
 #define CANAL_ERROR_COMMUNICATION				37 		// Some kind of communication error
 #define CANAL_ERROR_USER						38      // Login error
 
+/// ID flags
+#define CANAL_IDFLAG_STANDARD       0x00000000	// Standard message id (11-bit)
+#define CANAL_IDFLAG_EXTENDED       0x00000001	// Extended message id (29-bit)
+#define CANAL_IDFLAG_RTR            0x00000002	// RTR-Frame
+#define CANAL_IDFLAG_STATUS         0x00000004	// This package is a status indication (id holds error code)
+#define CANAL_IDFLAG_SEND           0x80000000  // Reserved for use by application software to indicate send
+
 struct CANAL_STATUS {
     unsigned long channel_status; // Current state for channel
     unsigned long lasterrorcode; // Last error code

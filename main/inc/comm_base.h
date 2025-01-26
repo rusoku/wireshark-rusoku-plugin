@@ -15,7 +15,9 @@ enum COMM_ERROR_CODES {
     COMM_SUCCESS = 0,
     COMM_LIB_ERROR_NULL = 1,
     COMM_LIB_ERROR = 2,
-    COMM_DEVICE_INIT_ERROR = 3
+    COMM_DEVICE_INIT_ERROR = 3,
+    COMM_DEVICE_IO_ERROR = 4,
+    COMM_POINTER_ERROR = 5
 };
 
 enum COMM_MANUFACTURER {
@@ -78,8 +80,7 @@ enum COMM_ERROR_CODES comm_open_device(COMM_DEV_HANDLE dev_handle, struct INTERF
 
 enum COMM_ERROR_CODES comm_close_device(COMM_DEV_HANDLE dev_handle, struct INTERFACE_PARAMETERS interface);
 
-enum COMM_ERROR_CODES comm_get_device_data_available(COMM_DEV_HANDLE comm_dev_handle,
-                                                     struct COMM_CAN_MSG *comm_can_msg);
+enum COMM_ERROR_CODES comm_get_device_data_available(COMM_DEV_HANDLE comm_dev_handle, uint32_t *frame_cnt);
 
 enum COMM_ERROR_CODES comm_read_frame(COMM_DEV_HANDLE comm_dev_handle, struct COMM_CAN_MSG *comm_can_msg);
 
