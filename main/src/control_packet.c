@@ -78,10 +78,25 @@ void *ctrl_read_thread(void *ptr) {
                     }
                     break;
                 case CONTROL_2: // CAN data
+                    uint8_t tmp_buff[] = {0, 0, 0};
                     if (payload_length != 0) {
                         fread(buff, 1, payload_length, ctrl_in);
-                        buff[payload_length] = 0;
-                        can_msg.data[0] = strtol((char *) buff, NULL, 16);
+                        payload_length -= 2; // remove "0x" from string
+
+                        //PCAP_DEBUG("control:data_payload_length=%d\n", payload_length);
+
+                        uint32_t buffer_index = 2, data_index = 0;
+                        while (buffer_index <= payload_length) {
+                            memcpy(&tmp_buff[0], &buff[buffer_index++], 1);
+                            memcpy(&tmp_buff[1], &buff[buffer_index++], 1);
+                            tmp_buff[2] = 0;
+
+                            if (data_index > 7)
+                                continue;
+                            can_msg.data[data_index] = strtol((char *) tmp_buff, NULL, 16);
+                            //PCAP_DEBUG("can_msg.data[%d] = %02X\n", data_index, can_msg.data[data_index]);
+                            data_index++;
+                        }
                     }
                     break;
                 case CONTROL_3: // SEND button
@@ -115,5 +130,6 @@ void *ctrl_send_thread(void *ptr) {
 
     CAN_DEBUG("control:RETURN");
     */
+    usleep(1000);
     return NULL;
 }

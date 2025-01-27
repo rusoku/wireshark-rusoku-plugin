@@ -144,13 +144,12 @@ int main(int argc, char **argv) {
         }
 
         printf(
-            "control {number=0}{type=string}{display=Msg ID}{tooltip=Custom frame message ID (0xNNNNNNNN)}{validation=^(([01][a-fA-F0-9]{0,7})|([a-fA-F0-9]{0,7}))$}\n");
+            "control {number=0}{type=string}{display=Msg ID}{tooltip=Custom frame message ID (0xNNNNNNNN)}{validation=^\\b0x(([01][a-fA-F0-9]{0,7})|([a-fA-F0-9]{0,7}))$}\n");
         printf("control {number=1}{type=boolean}{display=Extended}{tooltip=Extended CAN frame}{default=false}\n");
         printf(
-            "control {number=2}{type=string}{display=Message}{tooltip=Custom message (0-8 bytes, space separated)}{validation=^([a-fA-F0-9]{0,2}(s)*){0,8}$}\n");
+            "control {number=2}{type=string}{display=Message}{tooltip=Custom message (0-8 bytes, 0xNN)}{validation=^\\b0x([a-fA-F0-9]{2}(s)*){0,8}$}\n");
         printf(
             "control {number=3}{type=button}{display=Send}{tooltip=Send custom frame if values provided. If empty, sends a random frame}\n");
-
         exit(EXIT_SUCCESS);
     }
 
