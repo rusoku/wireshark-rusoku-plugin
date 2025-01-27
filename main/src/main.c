@@ -23,7 +23,7 @@ https://munich.dissec.to/kb/chapters/can/can-socketcan.html
 #include "../inc/comm_base.h"
 #include "../../rusoku/inc/comm_rusoku_win.h"
 
-#include "../inc/debug.h"
+#include "../inc/pcap_debug.h"
 
 /*
     ~/Library/Logs for user-oriented info from non-system software
@@ -151,7 +151,6 @@ int main(int argc, char **argv) {
         printf(
             "control {number=3}{type=button}{display=Send}{tooltip=Send custom frame if values provided. If empty, sends a random frame}\n");
 
-
         exit(EXIT_SUCCESS);
     }
 
@@ -163,7 +162,7 @@ int main(int argc, char **argv) {
 
     //extcap-version
     if (options[EXTCAP_VERSION].count) {
-        printf("extcap {version=1.0}{hel=https://www.rusoku.com}{display=RUSOKU CAN USB adapter extcap interface}\n");
+        printf("extcap {version=0.1.0}{hel=https://www.rusoku.com}{display=RUSOKU CAN USB adapter extcap interface}\n");
     }
 
     // extcap-config
@@ -208,25 +207,25 @@ int main(int argc, char **argv) {
     //extcap-control-in, ws-to-ext
     if (options[EXTCAP_CONTROL_IN].count) {
         interface_parameters.fifo_cntrl_in = options[EXTCAP_CONTROL_IN].argument;
-        DebugPrintf("main:fifo_cntrl_in=%s\n", options[EXTCAP_CONTROL_IN].argument);
+        PCAP_DEBUG("main:fifo_cntrl_in=%s\n", options[EXTCAP_CONTROL_IN].argument);
     }
 
     //extcap-control-out, ext-to-ws
     if (options[EXTCAP_CONTROL_OUT].count) {
         interface_parameters.fifo_cntrl_out = options[EXTCAP_CONTROL_OUT].argument;
-        DebugPrintf("main:fifo_cntrl_out=%s\n", options[EXTCAP_CONTROL_OUT].argument);
+        PCAP_DEBUG("main:fifo_cntrl_out=%s\n", options[EXTCAP_CONTROL_OUT].argument);
     }
 
     //extcap-bitrate
     if (options[PARAMETER_BITRATE].count) {
         interface_parameters.bitrate = (int32_t) strtol(options[PARAMETER_BITRATE].argument, NULL, 10);
-        //DebugPrintf("main:bitrate=%s\n", options[PARAMETER_BITRATE].argument);
+        //PCAP_DEBUG("main:bitrate=%s\n", options[PARAMETER_BITRATE].argument);
     }
 
     //extcap-bitrate-data
     if (options[PARAMETER_BITRATE_DATA].count) {
         interface_parameters.bitrate_data = (int32_t) strtol(options[PARAMETER_BITRATE_DATA].argument, NULL, 10);
-        //DebugPrintf("main:bitrate_data=%s\n", options[PARAMETER_BITRATE_DATA].argument);
+        //PCAP_DEBUG("main:bitrate_data=%s\n", options[PARAMETER_BITRATE_DATA].argument);
     }
 
     //extcap-silent
@@ -246,8 +245,7 @@ int main(int argc, char **argv) {
 
     //extcap-dlt_type
     if (options[PARAMETER_DLT_LINKTYPE].count) {
-        interface_parameters.dlt_type = (int8_t) strtol(options[PARAMETER_DLT_LINKTYPE].argument, NULL,
-                                                        10);
+        interface_parameters.dlt_type = (int8_t) strtol(options[PARAMETER_DLT_LINKTYPE].argument, NULL, 10);
     }
 
     //fifo

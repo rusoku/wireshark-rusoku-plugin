@@ -8,7 +8,7 @@
 #include "../inc/capture_demo.h"
 #include "../inc/capture.h"
 #include "../inc/comm_base.h"
-#include "../inc/debug.h"
+#include "../inc/pcap_debug.h"
 #include <signal.h>
 
 #include <stdbool.h>
@@ -86,14 +86,14 @@ void capture(struct INTERFACE_PARAMETERS interface_par) {
         exit(EXIT_FAILURE);
     }
 
-    //DebugPrintf("************** DEBUG **********************");
-    //DebugPrintf("capture:serial_nr=%s\n", interface.serial_str);
-    //DebugPrintf("capture:interface_nr=%ld\n", interface.interface_nr);
-    //DebugPrintf("capture:dlt_type=%ld\n", interface.dlt_type);
-    //DebugPrintf("capture:bitrate=%ld\n", interface.bitrate);
-    //DebugPrintf("capture:bitrate_data=%ld\n", interface.bitrate_data);
-    //DebugPrintf("capture:options=%08x\n", interface.options);
-    //DebugPrintf("\n");
+    //CAN_DEBUGPrintf("************** CAN_DEBUG **********************");
+    //CAN_DEBUGPrintf("capture:serial_nr=%s\n", interface.serial_str);
+    //CAN_DEBUGPrintf("capture:interface_nr=%ld\n", interface.interface_nr);
+    //CAN_DEBUGPrintf("capture:dlt_type=%ld\n", interface.dlt_type);
+    //CAN_DEBUGPrintf("capture:bitrate=%ld\n", interface.bitrate);
+    //CAN_DEBUGPrintf("capture:bitrate_data=%ld\n", interface.bitrate_data);
+    //CAN_DEBUGPrintf("capture:options=%08x\n", interface.options);
+    //CAN_DEBUGPrintf("\n");
 
     pcap_prepare_file_header(&pcap_file_header, LINKTYPE_CAN_SOCKETCAN);
     fwrite(&pcap_file_header, sizeof(struct PCAP_FILE_HEADER), 1, fp_data);

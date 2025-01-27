@@ -14,7 +14,7 @@
 #include <dlfcn.h>
 #include <pthread.h>
 #include "pcap.h"
-#include "debug.h"
+#include "pcap_debug.h"
 
 #define PCAP_TOTAL_DEVICES      8
 #define EXTCAP_INTERFACE        0
@@ -58,6 +58,6 @@ extern struct INTERFACE_PARAMETERS interface_parameters;
 extern int8_t interface;
 extern uint8_t onCapture;
 
-//extern FILE *fpdebug;
+//extern FILE *fpCAN_DEBUG;
 
 #endif //MAIN_H

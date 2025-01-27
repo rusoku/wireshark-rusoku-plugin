@@ -23,24 +23,22 @@ void print_current_time_with_ms (void)
 }
 */
 
-uint16_t randRange(int n)
-{
+uint16_t randRange(int n) {
     uint16_t limit;
     uint16_t r;
     limit = RAND_MAX - (RAND_MAX % n);
-    while((r = rand()) >= limit);
+    while ((r = rand()) >= limit);
     return r % n;
 }
 
 uint32_t swap_endianness(uint32_t bytes, int bit) {
     bytes = (bytes & 0xFFFF0000) >> 16 | (bytes & 0x0000FFFF) << 16;
-    bytes = (bytes & 0xFF00FF00) >> 8  | (bytes & 0x00FF00FF) << 8;
+    bytes = (bytes & 0xFF00FF00) >> 8 | (bytes & 0x00FF00FF) << 8;
     if (bit == 1) {
-        bytes = (bytes & 0xF0F0F0F0) >> 4  | (bytes & 0x0F0F0F0F) << 4;
+        bytes = (bytes & 0xF0F0F0F0) >> 4 | (bytes & 0x0F0F0F0F) << 4;
         bytes = (bytes & 0xCCCCCCCC) >> 2 | (bytes & 0x33333333) << 2;
         bytes = (bytes & 0xAAAAAAAA) >> 1 | (bytes & 0x55555555) << 1;
-    }
-    else if (bit == 16) bytes = bytes >> 16;
+    } else if (bit == 16) bytes = bytes >> 16;
     return bytes;
 }
 
@@ -57,8 +55,7 @@ void pcap_prepare_file_header(struct PCAP_FILE_HEADER *pcap_global_fh, uint32_t 
 }
 
 //struct PCAP_PACKET_RECORD_HEADER init_pcap_pkt_header(structCanalMsg *canal_frame, pcappkt_can *pcap_frame)
-struct PCAP_PACKET_RECORD_HEADER pcap_prepare_pkt_header(uint32_t pkt_cap_len, uint32_t pkt_len)
-{
+struct PCAP_PACKET_RECORD_HEADER pcap_prepare_pkt_header(uint32_t pkt_cap_len, uint32_t pkt_len) {
     static struct PCAP_PACKET_RECORD_HEADER pcap_packet_header = {};
     struct timespec spec = {};
 
@@ -72,8 +69,7 @@ struct PCAP_PACKET_RECORD_HEADER pcap_prepare_pkt_header(uint32_t pkt_cap_len, u
     return pcap_packet_header;
 }
 
-struct PCAP_LINKTYPE_LINUX_SLL_HEADER pcap_prepare_sll_header(uint16_t pkttype)
-{
+struct PCAP_LINKTYPE_LINUX_SLL_HEADER pcap_prepare_sll_header(uint16_t pkttype) {
     static struct PCAP_LINKTYPE_LINUX_SLL_HEADER sll_header = {};
     sll_header.sll_pkttype = swap_endianness(pkttype, 16);
     sll_header.sll_hatype = swap_endianness(HATYPE_ARPHRD_NONE, 16);
@@ -92,12 +88,11 @@ struct PCAP_LINKTYPE_LINUX_SLL_HEADER pcap_prepare_sll_header(uint16_t pkttype)
 //    uint8_t reserved2;  					/* reserved2 */
 //}__PACK;
 
-struct PCAP_LINKTYPE_CAN_SOCKETCAN pcap_prepare_socketcan_linktype_header(void)
-{
+struct PCAP_LINKTYPE_CAN_SOCKETCAN pcap_prepare_socketcan_linktype_header(void) {
     static struct PCAP_LINKTYPE_CAN_SOCKETCAN socketcan_frame = {};
-    socketcan_frame.can_id = swap_endianness(randRange(0x7FF), 0);// | swap_endianness(0x80000000, 0);
+    socketcan_frame.can_id = swap_endianness(randRange(0x7FF), 0); // | swap_endianness(0x80000000, 0);
     socketcan_frame.payload_length = 8;
-    socketcan_frame.fd_flags =  0;
+    socketcan_frame.fd_flags = 0;
     socketcan_frame.reserved1 = 0;
     socketcan_frame.reserved2 = 0;
 
@@ -112,8 +107,7 @@ struct PCAP_LINKTYPE_CAN_SOCKETCAN pcap_prepare_socketcan_linktype_header(void)
     return socketcan_frame;
 }
 
-struct PCAP_LINKTYPE_CAN_SOCKETCAN prepare_socketcan_linktype_from_canframe(struct CAN_FRAME *can_frame)
-{
+struct PCAP_LINKTYPE_CAN_SOCKETCAN prepare_socketcan_linktype_from_canframe(struct CAN_FRAME *can_frame) {
     static struct PCAP_LINKTYPE_CAN_SOCKETCAN socketcan_frame = {};
     if (can_frame->can_ext) {
         socketcan_frame.can_id = swap_endianness(can_frame->can_id, 0) | swap_endianness(0x80000000, 0);
@@ -121,12 +115,11 @@ struct PCAP_LINKTYPE_CAN_SOCKETCAN prepare_socketcan_linktype_from_canframe(stru
         socketcan_frame.can_id = swap_endianness(can_frame->can_id, 0);
     }
     socketcan_frame.payload_length = can_frame->can_dlc;
-    memcpy((void *)&socketcan_frame.data[0], (void*)&can_frame->can_data[0], 8);
+    memcpy((void *) &socketcan_frame.data[0], (void *) &can_frame->can_data[0], 8);
     return socketcan_frame;
 }
 
-struct SOCKETCAN_FRAME_HEADER init_rnd_fake_can_header(void)
-{
+struct SOCKETCAN_FRAME_HEADER init_rnd_fake_can_header(void) {
     static struct SOCKETCAN_FRAME_HEADER can_frame = {};
     can_frame.can_id = randRange(1000);
     can_frame.can_dlc = 8;
@@ -172,4 +165,3 @@ void get_timestamp(uint32_t *seconds, uint32_t *msec)
     *msec = uint32_t(pTime->wMilliseconds)*1000;
 }
 */
-

@@ -36,7 +36,7 @@
 *.x86_64
 *.hex
 
-# Debug files
+# CAN_DEBUG files
 *.dSYM/
 *.su
 *.idb

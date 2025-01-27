@@ -4,6 +4,7 @@
 #include "../inc/control_packet.h"
 #include "../inc/comm_base.h"
 #include "../inc/main.h"
+#include "../inc/pcap_debug.h"
 
 /******************** threads ************************/
 void *ctrl_read_thread(void *ptr) {
@@ -18,13 +19,13 @@ void *ctrl_read_thread(void *ptr) {
     while (onCapture) {
         fread(&ctrl_packet, sizeof(struct CONTROL_PACKET_HEADERS), 1, ctrl_in);
         /*
-                DebugPrintf("************** CONTROL PACKET **********************");
-                DebugPrintf("control:Sync Pipe Indication=%C\n", ctrl_packet.sync);
-                DebugPrintf("control:Len2=%d\n", ctrl_packet.len[2]);
-                DebugPrintf("control:Len1=%d\n", ctrl_packet.len[1]);
-                DebugPrintf("control:Len0=%d\n", ctrl_packet.len[0]);
-                DebugPrintf("control:CtlrNumber=%d\n", ctrl_packet.ctrl_number);
-                DebugPrintf("control:Command=%d\n", ctrl_packet.command);
+                PCAP_DEBUG("************** CONTROL PACKET **********************");
+                PCAP_DEBUG("control:Sync Pipe Indication=%C\n", ctrl_packet.sync);
+                PCAP_DEBUG("control:Len2=%d\n", ctrl_packet.len[2]);
+                PCAP_DEBUG("control:Len1=%d\n", ctrl_packet.len[1]);
+                PCAP_DEBUG("control:Len0=%d\n", ctrl_packet.len[0]);
+                PCAP_DEBUG("control:CtlrNumber=%d\n", ctrl_packet.ctrl_number);
+                PCAP_DEBUG("control:Command=%d\n", ctrl_packet.command);
         */
         payload_length = (ctrl_packet.len[1] << 16 | ctrl_packet.len[1] << 8 | ctrl_packet.len[2]);
 
@@ -71,6 +72,8 @@ void *ctrl_read_thread(void *ptr) {
                         fread(buff, 1, payload_length, ctrl_in);
                         if (buff[0] == 1) {
                             can_msg.flags |= CAN_FLAG_EXTENDED;
+                        } else {
+                            can_msg.flags &= ~CAN_FLAG_EXTENDED;
                         }
                     }
                     break;
@@ -82,8 +85,8 @@ void *ctrl_read_thread(void *ptr) {
                     }
                     break;
                 case CONTROL_3: // SEND button
-                    DebugPrintf("CAN id=%08X,CAN flags=%X, CAN data0=%02X)", can_msg.id, can_msg.flags, can_msg.data[0]);
-                    //memset(&can_msg, 0, sizeof(can_msg));
+                    PCAP_DEBUG("CAN id=%08X,CAN flags=%X, CAN data0=%02X)", can_msg.id, can_msg.flags, can_msg.data[0]);
+                //memset(&can_msg, 0, sizeof(can_msg));
                     break;
                 default:
                     break;
@@ -91,7 +94,7 @@ void *ctrl_read_thread(void *ptr) {
         }
     }
 
-    DebugPrintf("control:RETURN");
+    PCAP_DEBUG("control:RETURN");
     return NULL;
 }
 
@@ -110,7 +113,7 @@ void *ctrl_send_thread(void *ptr) {
     fwrite(&ctrl_packet, sizeof(struct CONTROL_PACKET_HEADERS), 1, ctrl_out);
     fwrite(&ctrl_packet, 10, 1, ctrl_out);
 
-    DebugPrintf("control:RETURN");
+    CAN_DEBUG("control:RETURN");
     */
     return NULL;
 }

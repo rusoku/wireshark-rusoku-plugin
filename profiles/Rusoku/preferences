@@ -362,19 +362,19 @@ capture.devices_pmode: \Device\NPF_{6DEA801E-B8CF-4A14-B170-6BEB28164F97}(1),ED0
 ####### Console ########
 
 # Log level
-# Console log level (for debugging)
+# Console log level (for CAN_DEBUGging)
 # A bitmask of log levels:
 # ERROR    = 4
 # CRITICAL = 8
 # WARNING  = 16
 # MESSAGE  = 32
 # INFO     = 64
-# DEBUG    = 128
+# CAN_DEBUG    = 128
 #console.log.level: 28
 
-# Look for dissectors that left some bytes undecoded (debug)
+# Look for dissectors that left some bytes undecoded (CAN_DEBUG)
 # TRUE or FALSE (case-insensitive)
-#console.incomplete_dissectors_check_debug: FALSE
+#console.incomplete_dissectors_check_CAN_DEBUG: FALSE
 
 ####### Extcap Utilities ########
 
@@ -1454,7 +1454,7 @@ extcap.ed___1__.status: false
 # TRUE or FALSE (case-insensitive)
 #dicom.seq_tree: TRUE
 
-# Create a node for a tag and show tag details as single elements. This can be useful to debug a tag and to allow display filters on these attributes. When using TShark to create a text output, it's better to have it disabled. 
+# Create a node for a tag and show tag details as single elements. This can be useful to CAN_DEBUG a tag and to allow display filters on these attributes. When using TShark to create a text output, it's better to have it disabled.
 # TRUE or FALSE (case-insensitive)
 #dicom.tag_tree: FALSE
 
@@ -1547,10 +1547,10 @@ extcap.ed___1__.status: false
 # TRUE or FALSE (case-insensitive)
 #dsi.desegment: TRUE
 
-# redirect dtls debug to file name; leave empty to disable debug, use "-" to redirect output to stderr
+# redirect dtls CAN_DEBUG to file name; leave empty to disable CAN_DEBUG, use "-" to redirect output to stderr
 # 
 # A path to a file
-#dtls.debug_file: 
+#dtls.CAN_DEBUG_file:
 
 # Semicolon-separated list of private RSA keys used for DTLS decryption. Used by versions of Wireshark prior to 1.6
 # A string
@@ -1942,9 +1942,9 @@ extcap.ed___1__.status: false
 # TRUE or FALSE (case-insensitive)
 #llcgprs.autodetect_cipher_bit: FALSE
 
-# Help for debug...
+# Help for CAN_DEBUG...
 # TRUE or FALSE (case-insensitive)
-#gquic.debug.quic: FALSE
+#gquic.CAN_DEBUG.quic: FALSE
 
 # Normally application/grpc message is protobuf, but sometime the true message is json. If this option in on, we always check whether the message is JSON (body starts with '{' and ends with '}') regardless of grpc_message_type_subdissector_table settings (which dissect grpc message according to content-type).
 # TRUE or FALSE (case-insensitive)
@@ -1956,11 +1956,11 @@ extcap.ed___1__.status: false
 
 # No description
 # TRUE or FALSE (case-insensitive)
-#gsm_ipa.hsl_debug_in_root_tree: FALSE
+#gsm_ipa.hsl_CAN_DEBUG_in_root_tree: FALSE
 
 # No description
 # TRUE or FALSE (case-insensitive)
-#gsm_ipa.hsl_debug_in_info: FALSE
+#gsm_ipa.hsl_CAN_DEBUG_in_info: FALSE
 
 # Whether the dissector should reassemble SMS spanning multiple packets
 # TRUE or FALSE (case-insensitive)
@@ -3227,9 +3227,9 @@ extcap.ed___1__.status: false
 # TRUE or FALSE (case-insensitive)
 #opensafety.mbtcp_big_endian: FALSE
 
-# Enables additional information in the dissection for better debugging an openSAFETY trace
+# Enables additional information in the dissection for better CAN_DEBUGging an openSAFETY trace
 # TRUE or FALSE (case-insensitive)
-#opensafety.debug_verbose: FALSE
+#opensafety.CAN_DEBUG_verbose: FALSE
 
 # Enable heuristic dissection for openSAFETY over UDP encoded traffic
 # TRUE or FALSE (case-insensitive)
@@ -4117,9 +4117,9 @@ extcap.ed___1__.status: false
 # TRUE or FALSE (case-insensitive)
 #ssh.desegment_buffers: TRUE
 
-# Redirect SSL debug to the file specified. Leave empty to disable debugging or use "-" to redirect output to stderr.
+# Redirect SSL CAN_DEBUG to the file specified. Leave empty to disable CAN_DEBUGging or use "-" to redirect output to stderr.
 # A path to a file
-#ssl.debug_file: 
+#ssl.CAN_DEBUG_file:
 
 # Semicolon-separated list of private RSA keys used for SSL decryption. Used by versions of Wireshark prior to 1.6
 # A string
@@ -4489,7 +4489,7 @@ extcap.ed___1__.status: false
 
 # Set this only to troubleshoot problems
 # TRUE or FALSE (case-insensitive)
-#transum.debug_enabled: FALSE
+#transum.CAN_DEBUG_enabled: FALSE
 
 # Critical Traffic Mask (base hex)
 # A hexadecimal number
@@ -4618,9 +4618,9 @@ extcap.ed___1__.status: false
 # TRUE or FALSE (case-insensitive)
 #wimaxasncp.show_transaction_id_d_bit: FALSE
 
-# Print debug output to the console.
+# Print CAN_DEBUG output to the console.
 # TRUE or FALSE (case-insensitive)
-#wimaxasncp.debug_enabled: FALSE
+#wimaxasncp.CAN_DEBUG_enabled: FALSE
 
 # Version of the NWG that the R6 protocol complies with
 # One of: R1.0 v1.0.0, R1.0 v1.2.0, R1.0 v1.2.1

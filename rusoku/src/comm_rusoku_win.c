@@ -5,7 +5,7 @@
 #include "../../main/inc/comm_base.h"
 #include "../inc/comm_rusoku_win.h"
 
-#include "../../main/inc/debug.h"
+#include "../../main/inc/pcap_debug.h"
 
 uint32_t comm_device_cnt = 0;
 
@@ -111,7 +111,7 @@ enum COMM_ERROR_CODES comm_open_device(COMM_DEV_HANDLE dev_handle, struct INTERF
 
     strcpy(interface.serial_str, comm_devices[interface.interface_nr].serial);
     sprintf(buffer, "0;%s;%d", interface.serial_str, interface.bitrate);
-    DebugPrintf("comm_rusoku: open_device %s\n", buffer);
+    PCAP_DEBUG("comm_rusoku: open_device %s\n", buffer);
 
     canal_handler = CanalOpen(buffer, 0);
     if (canal_handler < 0) {
