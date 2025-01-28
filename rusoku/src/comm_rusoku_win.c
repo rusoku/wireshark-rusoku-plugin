@@ -117,7 +117,6 @@ enum COMM_ERROR_CODES comm_open_device(COMM_DEV_HANDLE dev_handle, struct INTERF
     if (canal_handler < 0) {
         return COMM_DEVICE_INIT_ERROR;
     }
-
     return COMM_SUCCESS;
 }
 

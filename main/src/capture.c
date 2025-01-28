@@ -116,4 +116,3 @@ void capture(struct INTERFACE_PARAMETERS interface_par) {
     }
     comm_close_device(0, interface_parameters);
 }
-
