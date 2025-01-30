@@ -45,6 +45,7 @@ PACK__ struct PCAP_FILE_HEADER {
     uint32_t    linktype;
 }__PACK;
 
+/**************** LINKTYPE_LINUX_SLL 	113 	DLT_LINUX_SLL ****************/
 // A Packet Record is the standard container for storing the packets coming from the network.
 PACK__ struct PCAP_PACKET_RECORD_HEADER{
     uint32_t    sec;
@@ -53,8 +54,6 @@ PACK__ struct PCAP_PACKET_RECORD_HEADER{
     uint32_t    len;
 }__PACK;
 
-/************************************ LINKTYPE'S ******************************************/
-/*********** LINKTYPE_LINUX_SLL 	113 	DLT_LINUX_SLL ****************/
 //https://www.tcpdump.org/linktypes/LINKTYPE_LINUX_SLL.html
 PACK__ struct PCAP_LINKTYPE_LINUX_SLL_HEADER {
     uint16_t    sll_pkttype;					/* packet type */
@@ -64,7 +63,7 @@ PACK__ struct PCAP_LINKTYPE_LINUX_SLL_HEADER {
     uint16_t    sll_protocol;					/* protocol */
 }__PACK;
 
-/*********** LINKTYPE_IPV4 	228 	DLT_IPV4 *******************************/
+/********************* LINKTYPE_IPV4 	228 	DLT_IPV4 *******************************/
 //https://www.tcpdump.org/linktypes/LINKTYPE_CAN_SOCKETCAN.html
 PACK__ struct PCAP_LINKTYPE_CAN_SOCKETCAN {
     uint32_t    can_id;			        		/* can id */
@@ -86,6 +85,14 @@ PACK__ struct SOCKETCAN_FRAME_HEADER {
 
 /*********** LINKTYPE_LINUX_SLL2 	276 	DLT_LINUX_SLL2 *******************/
 //https://www.tcpdump.org/linktypes/LINKTYPE_LINUX_SLL2.html
+PACK__ struct PCAP_LINKTYPE_LINUX_SLL2_HEADER {
+    uint16_t    sll2_protocol_type;					/* packet type */
+    uint16_t    sll2_hatype;				        /* link-layer address type */
+    uint16_t    sll2_halen;						/* link-layer address length */
+    uint8_t     sll2_addr[SLL_ADDRLEN];			/* link-layer address */
+    uint16_t    sll2_protocol;					/* protocol */
+}__PACK;
+
 
 
 struct CAN_FRAME {
@@ -94,6 +101,7 @@ struct CAN_FRAME {
     uint8_t    can_dlc;
     uint8_t    can_data[8];
 };
+
 
 uint32_t swap_endianness(uint32_t bytes, int bit);
 void pcap_prepare_file_header(struct PCAP_FILE_HEADER *pcap_global_fh, uint32_t dlt);

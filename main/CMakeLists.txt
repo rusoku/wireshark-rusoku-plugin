@@ -10,8 +10,6 @@ set(SOURCES
         inc/main.h
         inc/pcap.h
         src/pcap.c
-        src/capture_demo.c
-        inc/capture_demo.h
         src/capture.c
         inc/capture.h
         src/comm_base.c

@@ -9,6 +9,7 @@
 #include "../inc/capture.h"
 #include "../inc/comm_base.h"
 #include "../inc/pcap_debug.h"
+#include "../inc/comm_base.h"
 #include <signal.h>
 
 #include <stdbool.h>
@@ -34,18 +35,7 @@ void capture(struct INTERFACE_PARAMETERS interface_par) {
     if (interface_par.interface_nr == -1)
         exit(EXIT_FAILURE);
 
-    struct CAN_FRAME can_frame[] = {
-        {0x7E8, 0, 8, 0x10, 0x2D, 0x62, 0xE0, 0x01, 0x9F, 0xF7, 0xFE},
-        {0x7E8, 0, 8, 0x21, 0x00, 0x00, 0xAA, 0x00, 0x00, 0x00, 0x00},
-        {0x7E8, 0, 8, 0x22, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-        {0x7E8, 0, 8, 0x23, 0, 0, 0, 0, 0, 0, 0},
-        {0x7E8, 0, 8, 0x24, 0, 0, 0, 0, 0, 0, 0},
-        {0x7E8, 0, 8, 0x10, 0x1A, 0x62, 0xE0, 0x04, 0xFF, 0xFF, 0x07},
-        {0x7E8, 0, 8, 0x21, 0, 0, 0, 0, 0, 0, 0},
-        {0x7E8, 0, 8, 0x10, 0x2D, 0x62, 0xE0, 0x01, 0x9F, 0xF7, 0xFE},
-        {0x7E8, 0, 8, 0x21, 0, 0, 0xAE, 0, 0, 0, 0}
-    };
-
+    struct COMM_CAN_MSG can_msg = {};
     FILE *fp_data = NULL;
     FILE *fp_ctrl_out = NULL;
     FILE *fp_ctrl_in = NULL;
@@ -69,8 +59,8 @@ void capture(struct INTERFACE_PARAMETERS interface_par) {
         exit(EXIT_FAILURE);
 
     //*** control threads ****
-    pthread_create(&control_thread_in, NULL, ctrl_read_thread, (void*)fp_ctrl_in);
-    pthread_create(&control_thread_out, NULL, ctrl_send_thread, (void*)fp_ctrl_out);
+    pthread_create(&control_thread_in, NULL, ctrl_read_thread, (void *) fp_ctrl_in);
+    pthread_create(&control_thread_out, NULL, ctrl_send_thread, (void *) fp_ctrl_out);
 
 #ifdef _WIN32
     SetConsoleCtrlHandler((PHANDLER_ROUTINE) sighandler, true);
@@ -100,6 +90,7 @@ void capture(struct INTERFACE_PARAMETERS interface_par) {
     fflush(fp_data);
 
     while (onCapture) {
+/*
         for (uint32_t x = 0; x <= sizeof(sizeof(can_frame) / sizeof(can_frame[0])); x++) {
             pcap_packet = pcap_prepare_pkt_header(PCAP_SOCKETCAN_PKT_LEN, PCAP_SOCKETCAN_PKT_LEN);
             fwrite(&pcap_packet, sizeof(struct PCAP_PACKET_RECORD_HEADER), 1, fp_data);
@@ -113,6 +104,7 @@ void capture(struct INTERFACE_PARAMETERS interface_par) {
         }
         //while (1)
         //usleep(100000);
+*/
     }
     comm_close_device(0, interface_parameters);
-}
+    }
