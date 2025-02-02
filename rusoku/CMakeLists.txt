@@ -11,6 +11,7 @@ if(WIN32)
     )
 elseif(APPLE)
     set(SOURCES
+            inc/CANAPI_Types.h
             src/comm_rusoku_apple.c
             inc/comm_rusoku_apple.h
     )
@@ -26,6 +27,7 @@ if(WIN32)
     target_link_libraries(${PROJECT_NAME} -lpthread -ldl)
 elseif(APPLE)
     message("OS:apple")
+    add_definitions(-DOPTION_CAN_2_0_ONLY)
     target_link_libraries(${PROJECT_NAME} -lpthread)
     list(APPEND CMAKE_BUILD_RPATH ${RPATH})
     set(RPATH /usr/local/lib)

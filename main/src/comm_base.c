@@ -4,4 +4,4 @@
 
 #include "../inc/comm_base.h"
 
-struct COMM_DEVICE comm_devices[8] = {};
+struct COMM_DEVICE comm_devices[64] = {};

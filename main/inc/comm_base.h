@@ -36,9 +36,9 @@ struct COMM_DEVICE {
     uint16_t id;
     enum COMM_MANUFACTURER manufacturer;
     enum COMM_DEVICE_MODEL device_model;
-    char manufacturer_str[64];
-    char device_model_str[64];
-    char serial[16];
+    char manufacturer_str[256];
+    char device_model_str[256];
+    char serial[256];
 };
 
 // CAN flags values

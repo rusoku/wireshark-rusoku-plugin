@@ -13,7 +13,7 @@
 #include <signal.h>
 
 #include <stdbool.h>
-#include <windows.h>
+//#include <windows.h>
 #include "../inc/control_packet.h"
 
 #include "../../rusoku/inc/comm_rusoku_win.h"
