@@ -34,7 +34,26 @@
 #define __PACK __pragma( pack(pop))
 #endif
 
-// A File Header has the following format.
+
+/********************* PCAP File Header has the following format **********************/
+/*
+  1                   2                   3
+  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+0 |                          Magic Number                         |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+4 |          Major Version        |         Minor Version         |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+8 |                           Reserved1                           |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+12|                           Reserved2                           |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+16|                            SnapLen                            |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+20| FCS |f|0 0 0 0 0 0 0 0 0 0 0 0|         LinkType              |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
+
 PACK__ struct PCAP_FILE_HEADER {
     uint32_t    magic;    //0xA1B2C3D4
     uint16_t    version_major; //2
@@ -45,14 +64,57 @@ PACK__ struct PCAP_FILE_HEADER {
     uint32_t    linktype;
 }__PACK;
 
-/**************** LINKTYPE_LINUX_SLL 	113 	DLT_LINUX_SLL ****************/
-// A Packet Record is the standard container for storing the packets coming from the network.
+/********************* PCAP Packet Record has the following format **********************/
+/*
+  1                   2                   3
+  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+0 |                      Timestamp (Seconds)                    |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+4 |            Timestamp (Microseconds or nanoseconds)          |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+8 |                    Captured Packet Length                   |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+12|                    Original Packet Length                   |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+16 /                                                            /
+   /                          Packet Data                       /
+   /                        variable length                     /
+   /                                                            /
+  +-------------------------------------------------------------+
+*/
+
 PACK__ struct PCAP_PACKET_RECORD_HEADER{
     uint32_t    sec;
     uint32_t    usec;
     uint32_t    caplen;
     uint32_t    len;
 }__PACK;
+
+
+/**************** LINKTYPE_LINUX_SLL 	113 	DLT_LINUX_SLL ****************/
+/*
++---------------------------+
+|         Packet type       |
+|         (2 Octets)        |
++---------------------------+
+|        ARPHRD_ type       |
+|         (2 Octets)        |
++---------------------------+
+| Link-layer address length |
+|         (2 Octets)        |
++---------------------------+
+|    Link-layer address     |
+|         (8 Octets)        |
++---------------------------+
+|        Protocol type      |
+|         (2 Octets)        |
++---------------------------+
+|           Payload         |
+.                           .
+.                           .
+.                           .
+*/
 
 //https://www.tcpdump.org/linktypes/LINKTYPE_LINUX_SLL.html
 PACK__ struct PCAP_LINKTYPE_LINUX_SLL_HEADER {
@@ -63,15 +125,43 @@ PACK__ struct PCAP_LINKTYPE_LINUX_SLL_HEADER {
     uint16_t    sll_protocol;					/* protocol */
 }__PACK;
 
-/********************* LINKTYPE_IPV4 	228 	DLT_IPV4 *******************************/
+/**************************** CAN bus frame ******************************/
+/*
++---------------------------+
+|      CAN ID and flags     |
+|         (4 Octets)        |
++---------------------------+
+|    Frame payload length   |
+|         (1 Octet)         |
++---------------------------+
+|          Padding          |
+|         (1 Octet)         |
++---------------------------+
+|      Reserved/Padding     |
+|         (1 Octet)         |
++---------------------------+
+|      Reserved/Padding     |
+|         (1 Octet)         |
++---------------------------+
+*/
+PACK__ struct PCAP_LINUX_SLL_CAN_FRAME_HEADER {
+  uint16_t    sll_can_id;	              /* CAN ID and flags */
+  uint8_t     sll_payload_length;       /* Frame payload length */
+  uint8_t     __sll_pad;				    		/* Padding */
+  uint8_t     __sll_res0;	      		    /* Reserved/Padding */
+  uint8_t     __sll_res1;					      /* Reserved/Padding */
+}__PACK;
+
+/********************* LINKTYPE_IPV4 	228 	DLT_IPV4 *******************************
+************************************************************************************
+************************************************************************************/
 //https://www.tcpdump.org/linktypes/LINKTYPE_CAN_SOCKETCAN.html
 PACK__ struct PCAP_LINKTYPE_CAN_SOCKETCAN {
     uint32_t    can_id;			        		/* can id */
-    uint8_t     payload_length;;                /* payload length */
-    uint8_t     fd_flags;						/* fd lags */
-    uint8_t     reserved1;			            /* reserved1 */
-    uint8_t     reserved2;  					/* reserved2 */
-    uint8_t     data[CAN_MAX_DLEN];
+    uint8_t     payload_length;;        /* payload length */
+    uint8_t     fd_flags;					    	/* fd lags */
+    uint8_t     reserved1;			        /* reserved1 */
+    uint8_t     reserved2;  					  /* reserved2 */
 }__PACK;
 
 PACK__ struct SOCKETCAN_FRAME_HEADER {
@@ -107,7 +197,7 @@ uint32_t swap_endianness(uint32_t bytes, int bit);
 void pcap_prepare_file_header(struct PCAP_FILE_HEADER *pcap_global_fh, uint32_t dlt);
 struct PCAP_LINKTYPE_LINUX_SLL_HEADER pcap_prepare_sll_header(uint16_t pkttype);
 struct PCAP_LINKTYPE_CAN_SOCKETCAN pacap_prepare_socketcan_linktype_header(void);
-struct PCAP_LINKTYPE_LINUX_SLL_HEADER pcap_prepare_sll2_header(uint16_t pkttype);
+struct PCAP_LINKTYPE_LINUX_SLL2_HEADER pcap_prepare_sll2_header(uint16_t pkttype);
 
 struct PCAP_PACKET_RECORD_HEADER pcap_prepare_pkt_header(uint32_t pkt_cap_len, uint32_t pkt_len);
 struct SOCKETCAN_FRAME_HEADER init_rnd_fake_can_header(void);

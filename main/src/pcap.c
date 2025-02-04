@@ -69,6 +69,7 @@ struct PCAP_PACKET_RECORD_HEADER pcap_prepare_pkt_header(uint32_t pkt_cap_len, u
     return pcap_packet_header;
 }
 
+/************************************* LINKTYPE_LINUX_SLL ***************************/
 struct PCAP_LINKTYPE_LINUX_SLL_HEADER pcap_prepare_sll_header(uint16_t pkttype) {
     static struct PCAP_LINKTYPE_LINUX_SLL_HEADER sll_header = {};
     sll_header.sll_pkttype = swap_endianness(pkttype, 16);

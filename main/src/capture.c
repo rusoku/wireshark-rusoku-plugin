@@ -3,6 +3,7 @@
 //
 
 #include <stdbool.h>
+#include <signal.h>
 #include "../inc/main.h"
 #include "../inc/pcap.h"
 #include "../inc/capture_demo.h"
@@ -10,15 +11,10 @@
 #include "../inc/comm_base.h"
 #include "../inc/pcap_debug.h"
 #include "../inc/comm_base.h"
-#include <signal.h>
-
-#include <stdbool.h>
-//#include <windows.h>
 #include "../inc/control_packet.h"
 
-#include "../../rusoku/inc/comm_rusoku_win.h"
-
 #ifdef _WIN32
+#include "windows.h"
 static BOOL WINAPI
 sighandler(uint64_t dwCtrlType)
 #else
@@ -72,7 +68,7 @@ void capture(struct INTERFACE_PARAMETERS interface_par) {
         exit(EXIT_FAILURE);
 #endif
 
-    if (comm_open_device(0, interface_parameters) != COMM_SUCCESS) {
+    if (comm_open_device(0, interface_par) != COMM_SUCCESS) {
         exit(EXIT_FAILURE);
     }
 
@@ -85,7 +81,22 @@ void capture(struct INTERFACE_PARAMETERS interface_par) {
     //CAN_DEBUGPrintf("capture:options=%08x\n", interface.options);
     //CAN_DEBUGPrintf("\n");
 
-    pcap_prepare_file_header(&pcap_file_header, LINKTYPE_CAN_SOCKETCAN);
+    uint32_t link_type;
+    switch (interface_par.dlt_type) {
+        case DLT_LINUX_SLL:
+            link_type = LINKTYPE_LINUX_SLL;
+        break;
+        case DLT_LINUX_SLL2:
+            link_type = LINKTYPE_LINUX_SLL2;
+        break;
+        case DLT_CAN_SOCKETCAN:
+            link_type = LINKTYPE_CAN_SOCKETCAN;
+        break;
+        default:
+            link_type = LINKTYPE_CAN_SOCKETCAN;
+    }
+
+    pcap_prepare_file_header(&pcap_file_header, link_type);
     fwrite(&pcap_file_header, sizeof(struct PCAP_FILE_HEADER), 1, fp_data);
     fflush(fp_data);
 
@@ -106,5 +117,5 @@ void capture(struct INTERFACE_PARAMETERS interface_par) {
         //usleep(100000);
 */
     }
-    comm_close_device(0, interface_parameters);
+    comm_close_device(0, interface_par);
     }
