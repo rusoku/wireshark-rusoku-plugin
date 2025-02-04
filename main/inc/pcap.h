@@ -34,7 +34,6 @@
 #define __PACK __pragma( pack(pop))
 #endif
 
-
 /********************* PCAP File Header has the following format **********************/
 /*
   1                   2                   3
@@ -55,11 +54,11 @@
 */
 
 PACK__ struct PCAP_FILE_HEADER {
-    uint32_t    magic;    //0xA1B2C3D4
+    uint32_t    magic;         //0xA1B2C3D4
     uint16_t    version_major; //2
     uint16_t    version_minor; //4
-    uint32_t    thiszone; // Reserved1.SHOULD be filled with 0
-    uint32_t    sigfigs;  // Reserved2.SHOULD be filled with 0
+    uint32_t    thiszone;      //Reserved1.SHOULD be filled with 0
+    uint32_t    sigfigs;       //Reserved2.SHOULD be filled with 0
     uint32_t    snaplen;
     uint32_t    linktype;
 }__PACK;
@@ -90,7 +89,6 @@ PACK__ struct PCAP_PACKET_RECORD_HEADER{
     uint32_t    caplen;
     uint32_t    len;
 }__PACK;
-
 
 /**************** LINKTYPE_LINUX_SLL 	113 	DLT_LINUX_SLL **************************
 ************************************************************************************
@@ -157,6 +155,34 @@ PACK__ struct PCAP_LINUX_SLL_CAN_FRAME_HEADER {
 /*********************** LINKTYPE_SOCKETCAN 	228 	 *******************************
 ************************************************************************************
 ************************************************************************************/
+/*
++---------------------------+
+|      CAN ID and flags     |
+|         (4 Octets)        |
++---------------------------+
+|       Payload length      |
+|         (1 Octet)         |
++---------------------------+
+|     FD flags (CAN FD)     |
+|         (1 Octet)         |
++---------------------------+
+|      Reserved/Padding     |
+|         (1 Octet)         |
++---------------------------+
+|     Len 8 DLC (CAN CC)    |
+|         (1 Octet)         |
++---------------------------+
+|          Payload          |
+.                           .
+.                           .
+.                           .
++---------------------------+
+|          Padding          |
+.                           .
+.                           .
+.                           .
+*/
+
 //https://www.tcpdump.org/linktypes/LINKTYPE_CAN_SOCKETCAN.html
 PACK__ struct PCAP_LINKTYPE_CAN_SOCKETCAN {
     uint32_t    can_id;			        		/* can id */
@@ -178,13 +204,38 @@ PACK__ struct SOCKETCAN_FRAME_HEADER {
 /****************** LINKTYPE_LINUX_SLL2 	276 	DLT_LINUX_SLL2 *********************
 ************************************************************************************
 ************************************************************************************/
+/*
++---------------------------+
+|         Packet type       |
+|         (2 Octets)        |
++---------------------------+
+|        ARPHRD_ type       |
+|         (2 Octets)        |
++---------------------------+
+| Link-layer address length |
+|         (2 Octets)        |
++---------------------------+
+|    Link-layer address     |
+|         (8 Octets)        |
++---------------------------+
+|        Protocol type      |
+|         (2 Octets)        |
++---------------------------+
+|           Payload         |
+.                           .
+.                           .
+.                           .
+*/
+
 //https://www.tcpdump.org/linktypes/LINKTYPE_LINUX_SLL2.html
 PACK__ struct PCAP_LINKTYPE_LINUX_SLL2_HEADER {
-    uint16_t    sll2_protocol_type;					/* packet type */
-    uint16_t    sll2_hatype;				        /* link-layer address type */
-    uint16_t    sll2_halen;						/* link-layer address length */
+    uint16_t    sll2_protocol_type;					/* Protocol type */
+    uint16_t    sll2_res;				            /* Reserved MBZ */
+    uint32_t    sll2_interface_index;	      /* Interface index */
+    uint16_t    sll2_arphdr_type;           /* ARPHDR type */
+    uint8_t     sll2_packet_type;           /* Packet type */
+    uint8_t     sll2_lladdress_length;   		/* link-layer address length */
     uint8_t     sll2_addr[SLL_ADDRLEN];			/* link-layer address */
-    uint16_t    sll2_protocol;					/* protocol */
 }__PACK;
 
 /*
