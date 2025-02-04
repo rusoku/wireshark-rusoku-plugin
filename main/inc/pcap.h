@@ -92,7 +92,9 @@ PACK__ struct PCAP_PACKET_RECORD_HEADER{
 }__PACK;
 
 
-/**************** LINKTYPE_LINUX_SLL 	113 	DLT_LINUX_SLL ****************/
+/**************** LINKTYPE_LINUX_SLL 	113 	DLT_LINUX_SLL **************************
+************************************************************************************
+************************************************************************************/
 /*
 +---------------------------+
 |         Packet type       |
@@ -152,7 +154,7 @@ PACK__ struct PCAP_LINUX_SLL_CAN_FRAME_HEADER {
   uint8_t     __sll_res1;					      /* Reserved/Padding */
 }__PACK;
 
-/********************* LINKTYPE_IPV4 	228 	DLT_IPV4 *******************************
+/*********************** LINKTYPE_SOCKETCAN 	228 	 *******************************
 ************************************************************************************
 ************************************************************************************/
 //https://www.tcpdump.org/linktypes/LINKTYPE_CAN_SOCKETCAN.html
@@ -173,7 +175,9 @@ PACK__ struct SOCKETCAN_FRAME_HEADER {
     uint8_t    data[CAN_MAX_DLEN];
 }__PACK;
 
-/*********** LINKTYPE_LINUX_SLL2 	276 	DLT_LINUX_SLL2 *******************/
+/****************** LINKTYPE_LINUX_SLL2 	276 	DLT_LINUX_SLL2 *********************
+************************************************************************************
+************************************************************************************/
 //https://www.tcpdump.org/linktypes/LINKTYPE_LINUX_SLL2.html
 PACK__ struct PCAP_LINKTYPE_LINUX_SLL2_HEADER {
     uint16_t    sll2_protocol_type;					/* packet type */
@@ -183,15 +187,14 @@ PACK__ struct PCAP_LINKTYPE_LINUX_SLL2_HEADER {
     uint16_t    sll2_protocol;					/* protocol */
 }__PACK;
 
-
-
+/*
 struct CAN_FRAME {
     uint32_t   can_id;
     uint8_t    can_ext;
     uint8_t    can_dlc;
     uint8_t    can_data[8];
 };
-
+*/
 
 uint32_t swap_endianness(uint32_t bytes, int bit);
 void pcap_prepare_file_header(struct PCAP_FILE_HEADER *pcap_global_fh, uint32_t dlt);
