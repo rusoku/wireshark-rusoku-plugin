@@ -72,15 +72,6 @@ void capture(struct INTERFACE_PARAMETERS interface_par) {
         exit(EXIT_FAILURE);
     }
 
-    //CAN_DEBUGPrintf("************** CAN_DEBUG **********************");
-    //CAN_DEBUGPrintf("capture:serial_nr=%s\n", interface.serial_str);
-    //CAN_DEBUGPrintf("capture:interface_nr=%ld\n", interface.interface_nr);
-    //CAN_DEBUGPrintf("capture:dlt_type=%ld\n", interface.dlt_type);
-    //CAN_DEBUGPrintf("capture:bitrate=%ld\n", interface.bitrate);
-    //CAN_DEBUGPrintf("capture:bitrate_data=%ld\n", interface.bitrate_data);
-    //CAN_DEBUGPrintf("capture:options=%08x\n", interface.options);
-    //CAN_DEBUGPrintf("\n");
-
     uint32_t link_type;
     switch (interface_par.dlt_type) {
         case DLT_LINUX_SLL:
@@ -101,7 +92,8 @@ void capture(struct INTERFACE_PARAMETERS interface_par) {
     fflush(fp_data);
 
     while (onCapture) {
-/*
+
+
         for (uint32_t x = 0; x <= sizeof(sizeof(can_frame) / sizeof(can_frame[0])); x++) {
             pcap_packet = pcap_prepare_pkt_header(PCAP_SOCKETCAN_PKT_LEN, PCAP_SOCKETCAN_PKT_LEN);
             fwrite(&pcap_packet, sizeof(struct PCAP_PACKET_RECORD_HEADER), 1, fp_data);
@@ -115,7 +107,7 @@ void capture(struct INTERFACE_PARAMETERS interface_par) {
         }
         //while (1)
         //usleep(100000);
-*/
+
     }
     comm_close_device(0, interface_par);
     }
