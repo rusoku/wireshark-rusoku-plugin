@@ -16,30 +16,14 @@ https://www.ietf.org/archive/id/draft-gharris-opsawg-pcap-00.html#name-packet-re
 https://munich.dissec.to/kb/chapters/can/can-socketcan.html
 */
 
+#include <stdlib.h>
 #include "../inc/gopt.h"
+#include "../inc/pcap_param.h"
 #include "../inc/main.h"
-#include "../inc/capture_demo.h"
 #include "../inc/capture.h"
+#include "../inc/pcap.h"
 #include "../inc/comm_base.h"
-#include "../../rusoku/inc/comm_rusoku_win.h"
-
 #include "../inc/pcap_debug.h"
-
-/*
-    ~/Library/Logs for user-oriented info from non-system software
-    /Library/Logs for Mac-ish system-wide event logging
-    /var/log for Unix-ish system-wide event logging
-*/
-
-uint8_t onCapture = 0;
-int8_t interface = -1;
-struct INTERFACE_PARAMETERS interface_parameters = {
-    .interface_nr = -1,
-    .dlt_type = 1,
-    .bitrate = 125,
-    .bitrate_data = 125,
-    .options = 0
-};
 
 int main(int argc, char **argv) {
     struct option options[GOPT_LAST_OPT + 1];
@@ -127,7 +111,7 @@ int main(int argc, char **argv) {
     // extcap-interfaces
     if (options[EXTCAP_INTERFACES].count) {
         printf(
-            "extcap {version=0.1.0}{help=https://www.rusoku.org}{display=RUSOKU CAN USB adapter extcap interface}\n");
+            "extcap {version=0.1.0.1}{help=https://www.rusoku.org}{display=RUSOKU CAN USB adapter extcap interface}\n");
 
         if (comm_get_device_list(comm_devices, &comm_device_cnt) != COMM_SUCCESS) {
             exit(EXIT_FAILURE);
@@ -156,12 +140,12 @@ int main(int argc, char **argv) {
     // extcap-interface
     if (options[EXTCAP_INTERFACE].count) {
         interface = (int8_t) strtol(options[EXTCAP_INTERFACE].argument, NULL, 10);
-        interface_parameters.interface_nr = interface;
+        pcap_main_interface_parameters.interface_nr = interface;
     }
 
     //extcap-version
     if (options[EXTCAP_VERSION].count) {
-        printf("extcap {version=0.1.0}{hel=https://www.rusoku.com}{display=RUSOKU CAN USB adapter extcap interface}\n");
+        printf("extcap {version=4.4}{hel=https://www.rusoku.com}{display=RUSOKU CAN USB adapter extcap interface}\n");
     }
 
     // extcap-config
@@ -188,7 +172,7 @@ int main(int argc, char **argv) {
 
     // extcap-dlts
     if (options[EXTCAP_DLTS].count) {
-        switch (interface_parameters.dlt_type) {
+        switch (pcap_main_interface_parameters.dlt_type) {
             case DLT_LINUX_SLL:
                 printf("dlt {number=113}{name=DLT_LINUX_SLL}{display=TouCAN}\n");
                 break;
@@ -205,57 +189,57 @@ int main(int argc, char **argv) {
 
     //extcap-control-in, ws-to-ext
     if (options[EXTCAP_CONTROL_IN].count) {
-        interface_parameters.fifo_cntrl_in = options[EXTCAP_CONTROL_IN].argument;
+        pcap_main_interface_parameters.fifo_cntrl_in = options[EXTCAP_CONTROL_IN].argument;
         PCAP_DEBUG("main:fifo_cntrl_in=%s\n", options[EXTCAP_CONTROL_IN].argument);
     }
 
     //extcap-control-out, ext-to-ws
     if (options[EXTCAP_CONTROL_OUT].count) {
-        interface_parameters.fifo_cntrl_out = options[EXTCAP_CONTROL_OUT].argument;
+        pcap_main_interface_parameters.fifo_cntrl_out = options[EXTCAP_CONTROL_OUT].argument;
         PCAP_DEBUG("main:fifo_cntrl_out=%s\n", options[EXTCAP_CONTROL_OUT].argument);
     }
 
     //extcap-bitrate
     if (options[PARAMETER_BITRATE].count) {
-        interface_parameters.bitrate = (int32_t) strtol(options[PARAMETER_BITRATE].argument, NULL, 10);
+        pcap_main_interface_parameters.bitrate = (int32_t) strtol(options[PARAMETER_BITRATE].argument, NULL, 10);
         //PCAP_DEBUG("main:bitrate=%s\n", options[PARAMETER_BITRATE].argument);
     }
 
     //extcap-bitrate-data
     if (options[PARAMETER_BITRATE_DATA].count) {
-        interface_parameters.bitrate_data = (int32_t) strtol(options[PARAMETER_BITRATE_DATA].argument, NULL, 10);
+        pcap_main_interface_parameters.bitrate_data = (int32_t) strtol(options[PARAMETER_BITRATE_DATA].argument, NULL, 10);
         //PCAP_DEBUG("main:bitrate_data=%s\n", options[PARAMETER_BITRATE_DATA].argument);
     }
 
     //extcap-silent
     if (options[PARAMETER_SILENT].count) {
-        interface_parameters.options |= INTERFACE_PARAMETER_OPTION_SILENT;
+        pcap_main_interface_parameters.options |= INTERFACE_PARAMETER_OPTION_SILENT;
     }
 
     //extcap-loopback
     if (options[PARAMETER_LOOPBACK].count) {
-        interface_parameters.options |= INTERFACE_PARAMETER_OPTION_LOOPBACK;
+        pcap_main_interface_parameters.options |= INTERFACE_PARAMETER_OPTION_LOOPBACK;
     }
 
     //extcap-canfd
     if (options[PARAMETER_CANFD].count) {
-        interface_parameters.options |= INTERFACE_PARAMETER_OPTION_CANFD;
+        pcap_main_interface_parameters.options |= INTERFACE_PARAMETER_OPTION_CANFD;
     }
 
     //extcap-dlt_type
     if (options[PARAMETER_DLT_LINKTYPE].count) {
-        interface_parameters.dlt_type = (int8_t) strtol(options[PARAMETER_DLT_LINKTYPE].argument, NULL, 10);
+        pcap_main_interface_parameters.dlt_type = (int8_t) strtol(options[PARAMETER_DLT_LINKTYPE].argument, NULL, 10);
     }
 
     //fifo
     if (options[FIFO].count) {
-        interface_parameters.fifo_data = options[FIFO].argument;
+        pcap_main_interface_parameters.fifo_data = options[FIFO].argument;
     }
 
     //capture
     if (options[CAPTURE].count) {
         onCapture = 1;
-        capture(interface_parameters);
+        capture(pcap_main_interface_parameters);
     }
     return (EXIT_SUCCESS);
 }

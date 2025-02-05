@@ -1,9 +1,12 @@
 //
 // Created by gedsi on 2025-01-22.
 
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include "../inc/pcap_param.h"
 #include "../inc/control_packet.h"
 #include "../inc/comm_base.h"
-#include "../inc/main.h"
 #include "../inc/pcap_debug.h"
 
 /******************** threads ************************/

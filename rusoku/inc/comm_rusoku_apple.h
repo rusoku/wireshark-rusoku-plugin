@@ -5,7 +5,6 @@
 #ifndef COMM_RUSOKU_APPLE_H
 #define COMM_RUSOKU_APPLE_H
 
-#include "../../main/inc/main.h"
 #include "../inc/CANAPI_Types.h"
 
 #define CAN_MAX_HANDLES         (8)     // maximum number of open handles

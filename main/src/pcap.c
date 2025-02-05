@@ -3,7 +3,13 @@
 //
 
 #include "../inc/pcap.h"
-#include <math.h>
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
+//#include <pthread.h>
+//#include <math.h>
+//#include "../inc/comm_base.h"
+
 
 /*
 void print_current_time_with_ms (void)
@@ -89,53 +95,42 @@ struct PCAP_LINKTYPE_LINUX_SLL_HEADER pcap_prepare_sll_header(uint16_t pkttype) 
 //    uint8_t reserved2;  					/* reserved2 */
 //}__PACK;
 
-struct PCAP_LINKTYPE_CAN_SOCKETCAN pcap_prepare_socketcan_linktype_header(void) {
-    static struct PCAP_LINKTYPE_CAN_SOCKETCAN socketcan_frame = {};
-    socketcan_frame.can_id = swap_endianness(randRange(0x7FF), 0); // | swap_endianness(0x80000000, 0);
-    socketcan_frame.payload_length = 8;
-    socketcan_frame.fd_flags = 0;
-    socketcan_frame.reserved1 = 0;
-    socketcan_frame.reserved2 = 0;
+// CAN flags values
+//#define CAN_FLAG_STANDARD    0x00000000L
+//#define CAN_FLAG_EXTENDED    0x00000001L
+//#define CAN_FLAG_RTR         0x00000002L
+//#define CAN_FLAG_STATUS      0x00000004L
+//#define CAN_FLAG_CAN_FD      0x00000008L
+//#define CAN_FLAG_CAN_XT      0x00000010L
+//#define CAN_FLAG_SEND        0x80000000L
 
-    socketcan_frame.data[0] = randRange(255);
-    socketcan_frame.data[1] = randRange(255);
-    socketcan_frame.data[2] = randRange(255);
-    socketcan_frame.data[3] = randRange(255);
-    socketcan_frame.data[4] = randRange(255);
-    socketcan_frame.data[5] = randRange(255);
-    socketcan_frame.data[6] = randRange(255);
-    socketcan_frame.data[7] = randRange(255);
-    return socketcan_frame;
-}
+// CAN error codes
+//#define CAN_STATUS_OK 0x00    // normal condition.
+//#define CAN_STATUS_OVERRUN 0x01
+//#define CAN_STATUS_BUSLIGHT 0x02
+//#define CAN_STATUS_BUSHEAVY 0x03
+//#define CAN_STATUS_BUSOFF   0x04
+/*
+struct COMM_CAN_MSG {
+    uint32_t id;
+    uint32_t error_status; // error counters (if CAN_FLAG_STATUS is set)
+    uint32_t error_code; // error codes
+    uint32_t flags; // can flags: STD, EXT, CAN FD etc.
+    uint8_t length;
+    uint8_t data[64];
+};*/
 
-struct PCAP_LINKTYPE_CAN_SOCKETCAN prepare_socketcan_linktype_from_canframe(struct CAN_FRAME *can_frame) {
-    static struct PCAP_LINKTYPE_CAN_SOCKETCAN socketcan_frame = {};
-    if (can_frame->can_ext) {
-        socketcan_frame.can_id = swap_endianness(can_frame->can_id, 0) | swap_endianness(0x80000000, 0);
+struct PCAP_LINKTYPE_CAN_CC_SOCKETCAN prepare_socketcan_linktype_from_canframe(struct COMM_CAN_MSG *can_frame) {
+    static struct PCAP_LINKTYPE_CAN_CC_SOCKETCAN socketcan_cc_frame = {};
+    if (can_frame->flags & CAN_FLAG_EXTENDED) {
+        socketcan_cc_frame.can_id = swap_endianness(can_frame->id, 0) | swap_endianness(0x80000000, 0);
     } else {
-        socketcan_frame.can_id = swap_endianness(can_frame->can_id, 0);
+        socketcan_cc_frame.can_id = swap_endianness(can_frame->id, 0);
     }
-    socketcan_frame.payload_length = can_frame->can_dlc;
-    memcpy((void *) &socketcan_frame.data[0], (void *) &can_frame->can_data[0], 8);
-    return socketcan_frame;
+    socketcan_cc_frame.payload_length = can_frame->length;
+    memcpy((void *) &socketcan_cc_frame.data[0], (void *) &can_frame->data[0], 8);
+    return socketcan_cc_frame;
 }
-
-struct SOCKETCAN_FRAME_HEADER init_rnd_fake_can_header(void) {
-    static struct SOCKETCAN_FRAME_HEADER can_frame = {};
-    can_frame.can_id = randRange(1000);
-    can_frame.can_dlc = 8;
-
-    can_frame.data[0] = randRange(255);
-    can_frame.data[1] = randRange(255);
-    can_frame.data[2] = randRange(255);
-    can_frame.data[3] = randRange(255);
-    can_frame.data[4] = randRange(255);
-    can_frame.data[5] = randRange(255);
-    can_frame.data[6] = randRange(255);
-    can_frame.data[7] = randRange(255);
-    return can_frame;
-}
-
 /*
 int convert_canal_to_socketcan(can_frame* can_frame, structCanalMsg* canal_frame)
 {

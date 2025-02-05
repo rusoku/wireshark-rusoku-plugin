@@ -5,10 +5,6 @@
 #ifndef COMM_RUSOKU_WIN_H
 #define COMM_RUSOKU_WIN_H
 
-#include "../../main/inc/main.h"
-
-extern struct COMM_DEVICE comm_devices[8];
-extern uint32_t comm_device_cnt;
 
 #define CANAL_DEVLIST_SIZE_MAX 64
 

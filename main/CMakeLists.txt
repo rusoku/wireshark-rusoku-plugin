@@ -15,10 +15,12 @@ set(SOURCES
         src/comm_base.c
         inc/comm_base.h
         src/main.c
-#        src/pcap_debug.c
-#        inc/pcap_debug.h
+        src/pcap_debug.c
+        inc/pcap_debug.h
         src/control_packet.c
         inc/control_packet.h
+        inc/pcap_param.h
+        src/pcap_param.c
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})

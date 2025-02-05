@@ -5,7 +5,7 @@
 #ifndef CONTROL_PACKET_H
 #define CONTROL_PACKET_H
 
-#include "main.h"
+#include <stdint.h>
 
 #define CTRL_CMD_INITIALIZED 0
 #define CTRL_CMD_SET		 1

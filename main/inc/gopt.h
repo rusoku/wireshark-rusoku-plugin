@@ -18,8 +18,8 @@
   through you.
 */
 
-#ifndef GOPT_H_INCLUDED
-#define GOPT_H_INCLUDED
+#ifndef GOPT_H
+#define GOPT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -140,4 +140,4 @@ void gopt_errors (const char *argv0, const struct option *options);
 }
 #endif
 
-#endif /* GOPT_H_INCLUDED */
+#endif /* GOPT_H */

@@ -5,7 +5,8 @@
 #ifndef COMM_BASE_H
 #define COMM_BASE_H
 
-#include "../inc/main.h"
+#include <stdint.h>
+#include "../../main/inc/pcap_param.h"
 
 #define COMM_TOTAL_DEVICES  8
 #define MANUFACTURER "RUSOKU"
@@ -67,6 +68,7 @@ struct COMM_CAN_MSG {
 };
 
 extern struct COMM_DEVICE comm_devices[];
+extern uint32_t comm_device_cnt;
 
 typedef int32_t COMM_DEV_HANDLE;
 
@@ -76,9 +78,9 @@ enum COMM_ERROR_CODES comm_deinit(void);
 
 enum COMM_ERROR_CODES comm_get_device_list(struct COMM_DEVICE *comm_devices, uint32_t *num_devices);
 
-enum COMM_ERROR_CODES comm_open_device(COMM_DEV_HANDLE dev_handle, struct INTERFACE_PARAMETERS interface);
+enum COMM_ERROR_CODES comm_open_device(COMM_DEV_HANDLE dev_handle, struct INTERFACE_PARAMETERS comm_interface);
 
-enum COMM_ERROR_CODES comm_close_device(COMM_DEV_HANDLE dev_handle, struct INTERFACE_PARAMETERS interface);
+enum COMM_ERROR_CODES comm_close_device(COMM_DEV_HANDLE dev_handle, struct INTERFACE_PARAMETERS comm_interface);
 
 enum COMM_ERROR_CODES comm_get_device_data_available(COMM_DEV_HANDLE comm_dev_handle, uint32_t *frame_cnt);
 

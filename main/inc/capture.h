@@ -8,7 +8,6 @@
 #include "stdint.h"
 #include "signal.h"
 
-void capture(struct INTERFACE_PARAMETERS interface_parameters);
-
+void capture(struct INTERFACE_PARAMETERS capture_interface_par);
 
 #endif //CAPTURE_H

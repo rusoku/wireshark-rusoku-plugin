@@ -5,7 +5,7 @@
 #ifndef PCAP_H
 #define PCAP_H
 
-#include "main.h"
+#include "../inc/comm_base.h"
 
 #define LINKTYPE_LINUX_SLL      113
 #define DLT_LINUX_SLL           0
@@ -23,7 +23,8 @@
 #define PKTTYPE_CAN_TX			0x4
 #define PKTTYPE_CAN_RX			0x1
 #define HATYPE_ARPHRD_NONE      0xFFFE
-#define CAN_MAX_DLEN			8
+#define CAN_CC_MAX_DLEN			8
+#define CAN_FD_MAX_DLEN			64
 
 #ifdef __GNUC__
 #define PACK__
@@ -155,7 +156,10 @@ PACK__ struct PCAP_LINUX_SLL_CAN_FRAME_HEADER {
 /*********************** LINKTYPE_SOCKETCAN 	228 	 *******************************
 ************************************************************************************
 ************************************************************************************/
-/*
+/************    ************ CAN CC and CAN FD frames *************   ***************
+    0x20000000 - set if the frame is an error message rather than a data frame (CAN CC only).
+    0x40000000 - set if the frame is a remote transmission request frame (CAN CC only).
+    0x80000000 - set if the frame is an extended 29-bit frame rather than a standard 11-bit frame.
 +---------------------------+
 |      CAN ID and flags     |
 |         (4 Octets)        |
@@ -184,22 +188,26 @@ PACK__ struct PCAP_LINUX_SLL_CAN_FRAME_HEADER {
 */
 
 //https://www.tcpdump.org/linktypes/LINKTYPE_CAN_SOCKETCAN.html
-PACK__ struct PCAP_LINKTYPE_CAN_SOCKETCAN {
-    uint32_t    can_id;			        		/* can id */
+#define CANID_FRAME_ERROR 0x2000000
+#define CANID_FRAME_RTR   0x4000000
+#define CANID_FRAME_EXT   0x8000000
+PACK__ struct PCAP_LINKTYPE_CAN_CC_SOCKETCAN {
+    uint32_t    can_id;			            /* can id and flags*/
     uint8_t     payload_length;;        /* payload length */
-    uint8_t     fd_flags;					    	/* fd lags */
+    uint8_t     fd_flags;					      /* fd lags */
     uint8_t     reserved1;			        /* reserved1 */
-    uint8_t     reserved2;  					  /* reserved2 */
+    uint8_t     reserved2;  			      /* reserved2 */
+    uint8_t     data[CAN_CC_MAX_DLEN];  /* CAN CC data */
 }__PACK;
 
-PACK__ struct SOCKETCAN_FRAME_HEADER {
-    uint32_t   can_id;  /* 32 bit CAN_ID + EFF/RTR/ERR flags */
-    uint8_t    can_dlc; /* frame payload length in byte (0 .. CAN_MAX_DLEN) */
-    uint8_t    __pad;   /* padding */
-    uint8_t    __res0;  /* reserved / padding */
-    uint8_t    __res1;  /* reserved / padding */
-    uint8_t    data[CAN_MAX_DLEN];
-}__PACK;
+//PACK__ struct SOCKETCAN_FRAME_HEADER {
+//    uint32_t   can_id;  /* 32 bit CAN_ID + EFF/RTR/ERR flags */
+//    uint8_t    can_dlc; /* frame payload length in byte (0 .. CAN_MAX_DLEN) */
+//    uint8_t    __pad;   /* padding */
+//    uint8_t    __res0;  /* reserved / padding */
+//    uint8_t    __res1;  /* reserved / padding */
+//    uint8_t    data[CAN_MAX_DLEN];
+//}__PACK;
 
 /****************** LINKTYPE_LINUX_SLL2 	276 	DLT_LINUX_SLL2 *********************
 ************************************************************************************
@@ -255,6 +263,6 @@ struct PCAP_LINKTYPE_LINUX_SLL2_HEADER pcap_prepare_sll2_header(uint16_t pkttype
 
 struct PCAP_PACKET_RECORD_HEADER pcap_prepare_pkt_header(uint32_t pkt_cap_len, uint32_t pkt_len);
 struct SOCKETCAN_FRAME_HEADER init_rnd_fake_can_header(void);
-struct PCAP_LINKTYPE_CAN_SOCKETCAN prepare_socketcan_linktype_from_canframe(struct CAN_FRAME *can_frame);
+struct PCAP_LINKTYPE_CAN_CC_SOCKETCAN prepare_socketcan_linktype_from_canframe(struct COMM_CAN_MSG *can_frame);
 
-#endif //PCAP_HEADERS_H
+#endif //PCAP_H
