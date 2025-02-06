@@ -1,0 +1,33 @@
+1 VERSIONINFO
+ FILEVERSION 0,1,0,1
+ PRODUCTVERSION 0,1,0,1
+ FILEFLAGSMASK 0x17L
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080904b0"
+        BEGIN
+            VALUE "Comments", "Addition Library"
+            VALUE "CompanyName", "Lithiumheads Inc."
+            VALUE "FileDescription", "Rusoku CAN adapters wireshark plugin."
+            VALUE "FileVersion", "0, 1, 0, 1"
+            VALUE "InternalName", "rusoku-extcap"
+            VALUE "LegalCopyright", "2025 Rusoku technologijos UAB"
+            VALUE "OriginalFilename", "RusokuExtcapPlugin.exe"
+            VALUE "ProductName", "extcap CAN bus plugin"
+            VALUE "ProductVersion", "0, 1, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x809, 1200
+    END
+END
