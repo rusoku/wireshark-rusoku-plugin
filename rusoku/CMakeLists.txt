@@ -1,13 +1,20 @@
 cmake_minimum_required(VERSION 3.30.5)
 project(wireshark_rusoku_extcap VERSION 0.0.1 LANGUAGES C)
 
+#https://stackoverflow.com/questions/16831866/how-to-add-version-details-to-exe-or-dll-through-cmake
+#https://vector-of-bool.github.io/2017/01/21/cmrc.html
+
 set(CMAKE_C_STANDARD 17)
 set(PROJECT_NAME RusokuExtcapPlugin)
+
+
+SET(CMAKE_COMPILE_RESOURCE "windres -I${CMAKE_CURRENT_SOURCE_DIR}/res <FLAGS> <SOURCE> <OBJECT>")
 
 if(WIN32)
     set(SOURCES
             src/comm_rusoku_win.c
             inc/comm_rusoku_win.h
+            src/res/extcap.rc
     )
 elseif(APPLE)
     set(SOURCES
