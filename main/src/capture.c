@@ -73,21 +73,6 @@ void capture(struct INTERFACE_PARAMETERS capture_interface_par) {
         exit(EXIT_FAILURE);
     }
 
-    /*  uint32_t link_type;
-        switch (interface_par.dlt_type) {
-            case DLT_LINUX_SLL:
-                link_type = LINKTYPE_LINUX_SLL;
-            break;
-            case DLT_LINUX_SLL2:
-                link_type = LINKTYPE_LINUX_SLL2;
-            break;
-            case DLT_CAN_SOCKETCAN:
-                link_type = LINKTYPE_CAN_SOCKETCAN;
-            break;
-            default:
-                link_type = LINKTYPE_CAN_SOCKETCAN;
-        }*/
-
     pcap_prepare_file_header(&pcap_file_header, LINKTYPE_CAN_SOCKETCAN);
     fwrite(&pcap_file_header, sizeof(struct PCAP_FILE_HEADER), 1, fp_data);
     fflush(fp_data);

@@ -193,7 +193,7 @@ PACK__ struct PCAP_LINUX_SLL_CAN_FRAME_HEADER {
 #define CANID_FRAME_EXT   0x8000000
 PACK__ struct PCAP_LINKTYPE_CAN_CC_SOCKETCAN {
     uint32_t    can_id;			            /* can id and flags*/
-    uint8_t     payload_length;;        /* payload length */
+    uint8_t     can_dlc;               /* payload length */
     uint8_t     fd_flags;					      /* fd lags */
     uint8_t     reserved1;			        /* reserved1 */
     uint8_t     reserved2;  			      /* reserved2 */

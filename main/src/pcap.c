@@ -127,7 +127,7 @@ struct PCAP_LINKTYPE_CAN_CC_SOCKETCAN prepare_socketcan_linktype_from_canframe(s
     } else {
         socketcan_cc_frame.can_id = swap_endianness(can_frame->id, 0);
     }
-    socketcan_cc_frame.payload_length = can_frame->length;
+    socketcan_cc_frame.can_dlc = can_frame->length;
     memcpy((void *) &socketcan_cc_frame.data[0], (void *) &can_frame->data[0], 8);
     return socketcan_cc_frame;
 }
