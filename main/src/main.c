@@ -118,8 +118,9 @@ int main(int argc, char **argv) {
         }
 
         for (int index = 0; index < (comm_device_cnt & 7); index++) {
-            printf("interface {value=%d}{display=%s CAN adapter interface %d - (%s %s s/n: %s)}\n",
-                   index,
+            printf("interface {value=TouCAN %s}{display=%s CAN adapter interface %d - (%s %s s/n: %s)}\n",
+                   //index,
+                   comm_devices[index].serial,
                    comm_devices[index].device_model_str,
                    index,
                    comm_devices[index].manufacturer_str,

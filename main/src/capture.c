@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <signal.h>
 #include <pthread.h>
+#include <unistd.h>
 #include "../inc/main.h"
 #include "../inc/pcap.h"
 #include "../inc/capture.h"
@@ -33,13 +34,14 @@ void capture(struct INTERFACE_PARAMETERS capture_interface_par) {
         exit(EXIT_FAILURE);
 
     struct COMM_CAN_MSG can_msg = {};
+    uint32_t comm_data_available = 0;
     FILE *fp_data = NULL;
     FILE *fp_ctrl_out = NULL;
     FILE *fp_ctrl_in = NULL;
     pthread_t control_thread_in, control_thread_out;
     struct PCAP_FILE_HEADER pcap_file_header = {};
     struct PCAP_PACKET_RECORD_HEADER pcap_packet = {};
-    //struct PCAP_LINKTYPE_CAN_CC_SOCKETCAN pcap_linktype_socketcan = {};
+    struct PCAP_LINKTYPE_CAN_CC_SOCKETCAN pcap_linktype_socketcan = {};
 
     fp_data = fopen(capture_interface_par.fifo_data, "wb");
     if (fp_data == NULL)
@@ -78,22 +80,17 @@ void capture(struct INTERFACE_PARAMETERS capture_interface_par) {
     fflush(fp_data);
 
     while (onCapture) {
-        /*
-                for (uint32_t x = 0; x <= sizeof(sizeof(can_frame) / sizeof(can_frame[0])); x++) {
-                    pcap_packet = pcap_prepare_pkt_header(PCAP_SOCKETCAN_PKT_LEN, PCAP_SOCKETCAN_PKT_LEN);
-                    fwrite(&pcap_packet, sizeof(struct PCAP_PACKET_RECORD_HEADER), 1, fp_data);
-
-                    //pcap_linktype_socketcan = init_socketcan_linktype_header();
-                    pcap_linktype_socketcan = prepare_socketcan_linktype_from_canframe(&can_frame[x]);
-                    fwrite(&pcap_linktype_socketcan, sizeof(struct PCAP_LINKTYPE_CAN_SOCKETCAN), 1, fp_data);
-
-                    fflush(fp_data);
-                    usleep(10000);
-
-                }
-        */
-        //while (1)
-        //usleep(100000);
-    }
+        if (comm_get_device_data_available(0, &comm_data_available) != COMM_SUCCESS || comm_data_available == 0) {
+            continue;
+        }
+        if (comm_read_frame(0, &can_msg) != COMM_SUCCESS) {
+            continue;
+        }
+        pcap_packet = pcap_prepare_pkt_header(PCAP_SOCKETCAN_PKT_LEN, PCAP_SOCKETCAN_PKT_LEN);
+        fwrite(&pcap_packet, sizeof(struct PCAP_PACKET_RECORD_HEADER), 1, fp_data);
+        pcap_linktype_socketcan = pcap_prepare_socketcan_linktype(&can_msg);
+        fwrite(&pcap_linktype_socketcan, sizeof(struct PCAP_LINKTYPE_CAN_CC_SOCKETCAN), 1, fp_data);
+        fflush(fp_data);
+    } //while (onCapture)
     comm_close_device(0, capture_interface_par);
 }

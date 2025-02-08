@@ -158,7 +158,7 @@ enum COMM_ERROR_CODES comm_read_frame(COMM_DEV_HANDLE comm_dev_handle, struct CO
     return COMM_SUCCESS;
 }
 
-enum COMM_ERROR_CODES comm_get_device_data_available(COMM_DEV_HANDLE comm_dev_handle,uint32_t *frame_cnt) {
+enum COMM_ERROR_CODES comm_get_device_data_available(COMM_DEV_HANDLE comm_dev_handle, uint32_t *frame_cnt) {
 
     if (canal_handler < 0) {
         return COMM_DEVICE_INIT_ERROR;
