@@ -1,20 +1,21 @@
+//  SPDX-License-Identifier: GPL-3.0-or-later
 //
-// Created by Gediminas Simanskis on 25/12/2024.
+//  Copyright (c) 2025 Gediminas Simanskis, Rusoku technologijos UAB, Vilnius, Lithuania (info@rusoku.com)
+//  All rights reserved.
 //
-
-/* gopt-usage.c   PUBILC DOMAIN 2015   t.gopt@purposeful.co.uk */
-
-/* <http:///www.purposeful.co.uk/software/gopt> */
-
-/*
-Links[...]
-https://ask.wireshark.org/question/29329/extcap-how-to-use-messages-control-protocol/
-https://github.com/openthread/pyspinel/blob/main/extcap_ot.py
-https://discussions.apple.com/thread/255759797?sortBy=rank
-https://github.com/secdev
-https://www.ietf.org/archive/id/draft-gharris-opsawg-pcap-00.html#name-packet-record
-https://munich.dissec.to/kb/chapters/can/can-socketcan.html
-*/
+//  GNU General Public License v3.0 or later:
+//  Rusoku wireshark extcap plugin is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  Rusoku wireshark extcap plugin is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with Rusoku wireshark extcap plugin.If not, see <https://www.gnu.org/licenses/>.
 
 #include <stdlib.h>
 #include "../inc/gopt.h"
