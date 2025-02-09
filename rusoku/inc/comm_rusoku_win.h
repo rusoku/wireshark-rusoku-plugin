@@ -4,7 +4,7 @@
 //  All rights reserved.
 //
 //  GNU General Public License v3.0 or later:
-//  Rusoku wireshark extcap plugin is free software: you can redistribute it and/or modify
+//  Rusoku wireshark CAN bus adapters extcap plugin is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
@@ -69,6 +69,9 @@
 #define CANAL_IDFLAG_RTR            0x00000002	// RTR-Frame
 #define CANAL_IDFLAG_STATUS         0x00000004	// This package is a status indication (id holds error code)
 #define CANAL_IDFLAG_SEND           0x80000000  // Reserved for use by application software to indicate send
+
+/// canal open options
+#define CANAL_SILENT_MODE           0x00000001
 
 struct CANAL_STATUS {
     unsigned long channel_status; // Current state for channel

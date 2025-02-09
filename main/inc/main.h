@@ -4,7 +4,7 @@
 //  All rights reserved.
 //
 //  GNU General Public License v3.0 or later:
-//  Rusoku wireshark extcap plugin is free software: you can redistribute it and/or modify
+//  Rusoku wireshark CAN bus adapters extcap plugin is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
@@ -51,10 +51,6 @@
 #define PARAMETER_DLT_LINKTYPE  17
 #define CAPTURE                 18
 #define GOPT_LAST_OPT           19
-
-#define INTERFACE_PARAMETER_OPTION_SILENT     0x00000001L
-#define INTERFACE_PARAMETER_OPTION_LOOPBACK   0x00000002L
-#define INTERFACE_PARAMETER_OPTION_CANFD      0x00000004L
 
 //extern FILE *fpCAN_DEBUG;
 

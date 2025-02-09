@@ -4,12 +4,12 @@
 //  All rights reserved.
 //
 //  GNU General Public License v3.0 or later:
-//  Rusoku wireshark extcap plugin is free software: you can redistribute it and/or modify
+//  Rusoku wireshark CAN bus adapters extcap plugin is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
-//  Rusoku wireshark extcap plugin is distributed in the hope that it will be useful,
+//  Rusoku wireshark CAN bus adapters extcap plugin is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
 //  GNU General Public License for more details.
@@ -122,6 +122,11 @@ enum COMM_ERROR_CODES comm_get_device_list(struct COMM_DEVICE *comm_devices, uin
 
 enum COMM_ERROR_CODES comm_open_device(COMM_DEV_HANDLE dev_handle, struct INTERFACE_PARAMETERS comm_interface) {
     char buffer[128];
+    uint32_t options = 0;
+
+    if (comm_interface.options && INTERFACE_PARAMETER_OPTION_SILENT) {
+        options |= CANAL_SILENT_MODE;
+    }
 
     if (comm_get_device_list(comm_devices, &comm_device_cnt) != COMM_SUCCESS) {
         return COMM_DEVICE_INIT_ERROR;
