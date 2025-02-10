@@ -21,6 +21,7 @@
 #include <string.h>
 #include "../inc/comm_rusoku_apple.h"
 #include "../../main/inc/comm_base.h"
+#include "../../main/inc/pcap_debug.h"
 
 //int can_test(int32_t channel, uint8_t mode, const void *param, int *result);
 //int can_init(int32_t channel, uint8_t mode, const void *param);
@@ -56,7 +57,7 @@ static void *handler = NULL;
 uint32_t comm_device_cnt = 0;
 
 enum COMM_ERROR_CODES comm_init(char *error_code) {
-    handler = dlopen("uvcantou.dylib", RTLD_LAZY);
+    handler = dlopen("libUVCANTOU.dylib", RTLD_LAZY);
 
     if (handler == NULL) {
         if (error_code != NULL) {
@@ -191,8 +192,9 @@ enum COMM_ERROR_CODES comm_get_device_list(struct COMM_DEVICE *comm_devices, uin
 
             m_handle = can_init(info.m_nChannelNo, 0, NULL);
             can_property(m_handle, TOUCAN_GET_SERIAL_NUMBER, &info.m_nSerialNumber, sizeof(int32_t));
-            char string[CANPROP_MAX_BUFFER_SIZE] = "(unknown)";
-            snprintf(string, 10, "%08X", info.m_nSerialNumber);
+            char serial_str[CANPROP_MAX_BUFFER_SIZE] = "(unknown)";
+            snprintf(serial_str, 10, "%08X", info.m_nSerialNumber);
+            strcpy(comm_devices[x].serial, serial_str);
             can_exit(m_handle);
         }
     }
