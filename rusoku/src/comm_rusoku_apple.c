@@ -17,6 +17,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Rusoku wireshark extcap plugin.If not, see <https://www.gnu.org/licenses/>.
 
+#include <dlfcn.h>
+#include <string.h>
 #include "../inc/comm_rusoku_apple.h"
 #include "../../main/inc/comm_base.h"
 

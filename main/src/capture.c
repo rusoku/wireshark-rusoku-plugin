@@ -21,6 +21,8 @@
 #include <signal.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "../inc/main.h"
 #include "../inc/pcap.h"
 #include "../inc/capture.h"
