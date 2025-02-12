@@ -54,6 +54,7 @@ can_hardware_fp can_hardware;
 can_version_fp can_version;
 
 static void *handler = NULL;
+static int32_t handle = -1;
 uint32_t comm_device_cnt = 0;
 
 enum COMM_ERROR_CODES comm_init(char *error_code) {
@@ -203,6 +204,37 @@ enum COMM_ERROR_CODES comm_get_device_list(struct COMM_DEVICE *comm_devices, uin
 };
 
 enum COMM_ERROR_CODES comm_open_device(COMM_DEV_HANDLE dev_handle, struct INTERFACE_PARAMETERS interface) {
+    if ((handle = can_init(interface.interface_nr, CANMODE_DEFAULT, NULL)) < CANERR_NOERROR) {
+        return false;
+    }
+
+    can_bitrate_t bitrate;
+    switch (interface.bitrate) {
+        case 1000000: bitrate.index = (int32_t) CANBTR_INDEX_1M;
+            break;
+        case 800000: bitrate.index = (int32_t) CANBTR_INDEX_800K;
+            break;
+        case 500000: bitrate.index = (int32_t) CANBTR_INDEX_500K;
+            break;
+        case 250000: bitrate.index = (int32_t) CANBTR_INDEX_250K;
+            break;
+        case 125000: bitrate.index = (int32_t) CANBTR_INDEX_125K;
+            break;
+        case 100000: bitrate.index = (int32_t) CANBTR_INDEX_100K;
+            break;
+        case 50000: bitrate.index = (int32_t) CANBTR_INDEX_50K;
+            break;
+        case 20000: bitrate.index = (int32_t) CANBTR_INDEX_20K;
+            break;
+        case 10000: bitrate.index = (int32_t) CANBTR_INDEX_10K;
+            break;
+        default: bitrate.index = (int32_t) CANBTR_INDEX_250K;
+            break;
+    }
+
+    if (can_start(handle, &bitrate) < CANERR_NOERROR) {
+        return COMM_DEVICE_INIT_ERROR;
+    }
     return COMM_SUCCESS;
 }
 
