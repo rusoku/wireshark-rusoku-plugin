@@ -24,21 +24,6 @@
 #include "../../main/inc/comm_base.h"
 #include "../../main/inc/pcap_debug.h"
 
-//int can_test(int32_t channel, uint8_t mode, const void *param, int *result);
-//int can_init(int32_t channel, uint8_t mode, const void *param);
-//int can_exit(int handle);
-//int can_kill(int handle);
-//int can_start(int handle, const can_bitrate_t *bitrate);
-//int can_reset(int handle);
-//int can_write(int handle, const can_message_t *message, uint16_t timeout);
-//int can_read(int handle, can_message_t *message, uint16_t timeout);
-//int can_status(int handle, uint8_t *status);
-//int can_busload(int handle, uint8_t *load, uint8_t *status);
-//int can_bitrate(int handle, can_bitrate_t *bitrate, can_speed_t *speed);
-//int can_property(int handle, uint16_t param, void *value, uint32_t nbyte);
-//char *can_hardware(int handle);
-//char* can_version(void);
-
 can_test_fp can_test;
 can_init_fp can_init;
 can_exit_fp can_exit;
