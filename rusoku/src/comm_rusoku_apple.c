@@ -19,6 +19,7 @@
 
 #include <dlfcn.h>
 #include <string.h>
+#include "../inc/CANAPI_Types.h"
 #include "../inc/comm_rusoku_apple.h"
 #include "../../main/inc/comm_base.h"
 #include "../../main/inc/pcap_debug.h"
@@ -203,13 +204,20 @@ enum COMM_ERROR_CODES comm_get_device_list(struct COMM_DEVICE *comm_devices, uin
     return COMM_SUCCESS;
 };
 
-enum COMM_ERROR_CODES comm_open_device(COMM_DEV_HANDLE dev_handle, struct INTERFACE_PARAMETERS interface) {
-    if ((handle = can_init(interface.interface_nr, CANMODE_DEFAULT, NULL)) < CANERR_NOERROR) {
-        return false;
+enum COMM_ERROR_CODES comm_open_device(COMM_DEV_HANDLE dev_handle, struct INTERFACE_PARAMETERS comm_interface) {
+    can_mode_t can_mode;
+    can_mode.byte = CANMODE_DEFAULT;
+
+    if (comm_interface.options && INTERFACE_PARAMETER_OPTION_SILENT) {
+        can_mode.mon = true;
+    }
+
+    if ((handle = can_init(comm_interface.interface_nr, CANMODE_DEFAULT, NULL)) < CANERR_NOERROR) {
+        return COMM_DEVICE_INIT_ERROR;
     }
 
     can_bitrate_t bitrate;
-    switch (interface.bitrate) {
+    switch (comm_interface.bitrate) {
         case 1000000: bitrate.index = (int32_t) CANBTR_INDEX_1M;
             break;
         case 800000: bitrate.index = (int32_t) CANBTR_INDEX_800K;
@@ -238,11 +246,16 @@ enum COMM_ERROR_CODES comm_open_device(COMM_DEV_HANDLE dev_handle, struct INTERF
     return COMM_SUCCESS;
 }
 
-enum COMM_ERROR_CODES comm_close_device(COMM_DEV_HANDLE dev_handle, struct INTERFACE_PARAMETERS interface) {
+enum COMM_ERROR_CODES comm_close_device(COMM_DEV_HANDLE dev_handle, struct INTERFACE_PARAMETERS comm_interface) {
+    can_exit(handle);
     return COMM_SUCCESS;
 }
 
 enum COMM_ERROR_CODES comm_get_device_data_available(COMM_DEV_HANDLE comm_dev_handle, uint32_t *frame_cnt) {
+    if (frame_cnt == NULL) {
+        return COMM_LIB_ERROR_NULL;
+    }
+    *frame_cnt = 1;
     return COMM_SUCCESS;
 }
 
