@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.30.5)
+cmake_minimum_required(VERSION 3.29.6)
 project(wireshark_rusoku_extcap C)
 
 set(CMAKE_C_STANDARD 17)

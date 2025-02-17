@@ -21,6 +21,9 @@
 #include <string.h>
 #include "../inc/CANAPI_Types.h"
 #include "../inc/comm_rusoku_apple.h"
+
+#include <unistd.h>
+
 #include "../../main/inc/comm_base.h"
 #include "../../main/inc/pcap_debug.h"
 
@@ -39,86 +42,86 @@ can_property_fp can_property;
 can_hardware_fp can_hardware;
 can_version_fp can_version;
 
-static void *handler = NULL;
-static int32_t handle = -1;
+static void *lib_handler = NULL;
+static int device_handle = -1;
 uint32_t comm_device_cnt = 0;
 
 enum COMM_ERROR_CODES comm_init(char *error_code) {
-    handler = dlopen("libUVCANTOU.dylib", RTLD_LAZY);
+    lib_handler = dlopen("libUVCANTOU.dylib", RTLD_LAZY);
 
-    if (handler == NULL) {
+    if (lib_handler == NULL) {
         if (error_code != NULL) {
             error_code = dlerror();
         }
         return COMM_LIB_ERROR_NULL;
     }
 
-    can_test = dlsym(handler, "can_test");
+    can_test = dlsym(lib_handler, "can_test");
     if (can_test == NULL) {
         return COMM_LIB_ERROR_NULL;
     }
 
-    can_init = dlsym(handler, "can_init");
+    can_init = dlsym(lib_handler, "can_init");
     if (can_init == NULL) {
         return COMM_LIB_ERROR_NULL;
     }
 
-    can_exit = dlsym(handler, "can_exit");
+    can_exit = dlsym(lib_handler, "can_exit");
     if (can_exit == NULL) {
         return COMM_LIB_ERROR_NULL;
     }
 
-    can_kill = dlsym(handler, "can_kill");
+    can_kill = dlsym(lib_handler, "can_kill");
     if (can_kill == NULL) {
         return COMM_LIB_ERROR_NULL;
     }
 
-    can_start = dlsym(handler, "can_start");
+    can_start = dlsym(lib_handler, "can_start");
     if (can_start == NULL) {
         return COMM_LIB_ERROR_NULL;
     }
 
-    can_reset = dlsym(handler, "can_reset");
+    can_reset = dlsym(lib_handler, "can_reset");
     if (can_reset == NULL) {
         return COMM_LIB_ERROR_NULL;
     }
 
-    can_write = dlsym(handler, "can_write");
+    can_write = dlsym(lib_handler, "can_write");
     if (can_write == NULL) {
         return COMM_LIB_ERROR_NULL;
     }
 
-    can_read = dlsym(handler, "can_read");
+    can_read = dlsym(lib_handler, "can_read");
     if (can_read == NULL) {
         return COMM_LIB_ERROR_NULL;
     }
 
-    can_status = dlsym(handler, "can_status");
+    can_status = dlsym(lib_handler, "can_status");
     if (can_status == NULL) {
         return COMM_LIB_ERROR_NULL;
     }
 
-    can_busload = dlsym(handler, "can_busload");
+    can_busload = dlsym(lib_handler, "can_busload");
     if (can_busload == NULL) {
         return COMM_LIB_ERROR_NULL;
     }
 
-    can_bitrate = dlsym(handler, "can_bitrate");
+    can_bitrate = dlsym(lib_handler, "can_bitrate");
     if (can_bitrate == NULL) {
         return COMM_LIB_ERROR_NULL;
     }
 
-    can_property = dlsym(handler, "can_property");
+    can_property = dlsym(lib_handler, "can_property");
     if (can_property == NULL) {
         return COMM_LIB_ERROR_NULL;
     }
 
-    can_hardware = dlsym(handler, "can_hardware");
+    can_hardware = dlsym(lib_handler, "can_hardware");
     if (can_hardware == NULL) {
         return COMM_LIB_ERROR_NULL;
     }
 
-    can_version = dlsym(handler, "can_version");
+    can_version = dlsym(lib_handler, "can_version");
     if (can_version == NULL) {
         return COMM_LIB_ERROR_NULL;
     }
@@ -126,10 +129,10 @@ enum COMM_ERROR_CODES comm_init(char *error_code) {
 };
 
 enum COMM_ERROR_CODES comm_deinit(void) {
-    if (handler == NULL) {
-        return COMM_LIB_ERROR;
+    if (lib_handler != NULL) {
+        dlclose(lib_handler);
+        lib_handler = NULL;
     }
-    dlclose(handler);
     return COMM_SUCCESS;
 };
 
@@ -145,7 +148,7 @@ enum COMM_ERROR_CODES comm_get_device_list(struct COMM_DEVICE *comm_devices, uin
         return COMM_LIB_ERROR_NULL;
     }
 
-    if (handler == NULL) {
+    if (lib_handler == NULL) {
         if (comm_init(NULL) != COMM_SUCCESS) {
             return COMM_LIB_ERROR_NULL;
         }
@@ -186,22 +189,30 @@ enum COMM_ERROR_CODES comm_get_device_list(struct COMM_DEVICE *comm_devices, uin
         }
     }
     *num_devices = devices_found;
+    comm_deinit();
     return COMM_SUCCESS;
 };
 
 enum COMM_ERROR_CODES comm_open_device(COMM_DEV_HANDLE dev_handle, struct INTERFACE_PARAMETERS comm_interface) {
     can_mode_t can_mode;
+    can_bitrate_t bitrate;
     can_mode.byte = CANMODE_DEFAULT;
 
     if (comm_interface.options && INTERFACE_PARAMETER_OPTION_SILENT) {
         can_mode.mon = true;
     }
 
-    if ((handle = can_init(comm_interface.interface_nr, CANMODE_DEFAULT, NULL)) < CANERR_NOERROR) {
-        return COMM_DEVICE_INIT_ERROR;
+    if (lib_handler == NULL) {
+        if (comm_init(NULL) != COMM_SUCCESS) {
+            return COMM_LIB_ERROR_NULL;
+        }
     }
 
-    can_bitrate_t bitrate;
+    device_handle = can_init(comm_interface.interface_nr, can_mode.byte, NULL);
+
+    if (device_handle < CANERR_NOERROR) {
+        return COMM_DEVICE_INIT_ERROR;
+    }
     switch (comm_interface.bitrate) {
         case 1000000: bitrate.index = (int32_t) CANBTR_INDEX_1M;
             break;
@@ -224,15 +235,14 @@ enum COMM_ERROR_CODES comm_open_device(COMM_DEV_HANDLE dev_handle, struct INTERF
         default: bitrate.index = (int32_t) CANBTR_INDEX_250K;
             break;
     }
-
-    if (can_start(handle, &bitrate) < CANERR_NOERROR) {
+    if (can_start(device_handle, &bitrate) < CANERR_NOERROR) {
         return COMM_DEVICE_INIT_ERROR;
     }
     return COMM_SUCCESS;
 }
 
 enum COMM_ERROR_CODES comm_close_device(COMM_DEV_HANDLE dev_handle, struct INTERFACE_PARAMETERS comm_interface) {
-    can_exit(handle);
+    can_exit(device_handle);
     return COMM_SUCCESS;
 }
 
@@ -245,9 +255,23 @@ enum COMM_ERROR_CODES comm_get_device_data_available(COMM_DEV_HANDLE comm_dev_ha
 }
 
 enum COMM_ERROR_CODES comm_read_frame(COMM_DEV_HANDLE comm_dev_handle, struct COMM_CAN_MSG *comm_can_msg) {
+    if (comm_can_msg == NULL) {
+        return COMM_LIB_ERROR_NULL;
+    }
+    comm_can_msg->id = 0x123;
+    comm_can_msg->flags = 0;
+    comm_can_msg->length = 2;
+    comm_can_msg->data[0] = 0x12;
+    comm_can_msg->data[1] = 0x34;
+
+    usleep(1000);
+
     return COMM_SUCCESS;
 }
 
 enum COMM_ERROR_CODES comm_write_frame(COMM_DEV_HANDLE comm_dev_handle, struct COMM_CAN_MSG *comm_can_msg) {
+    if (comm_can_msg == NULL) {
+        return COMM_LIB_ERROR_NULL;
+    }
     return COMM_SUCCESS;
 }

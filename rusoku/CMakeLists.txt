@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.30.5)
+cmake_minimum_required(VERSION 3.29.6)
 project(wireshark_rusoku_extcap VERSION 0.0.1 LANGUAGES C)
 
 #https://stackoverflow.com/questions/16831866/how-to-add-version-details-to-exe-or-dll-through-cmake

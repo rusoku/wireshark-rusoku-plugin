@@ -102,6 +102,7 @@ void capture(struct INTERFACE_PARAMETERS capture_interface_par) {
         if (comm_read_frame(0, &can_msg) != COMM_SUCCESS) {
             continue;
         }
+
         pcap_packet = pcap_prepare_pkt_header(PCAP_SOCKETCAN_PKT_LEN, PCAP_SOCKETCAN_PKT_LEN);
         fwrite(&pcap_packet, sizeof(struct PCAP_PACKET_RECORD_HEADER), 1, fp_data);
         pcap_linktype_socketcan = pcap_prepare_socketcan_linktype(&can_msg);
