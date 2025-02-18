@@ -31,6 +31,32 @@
 #define TOUCAN_GET_DEVICE_ID           (CANPROP_GET_VENDOR_PROP + 0x17U)  /**< device id. (uint23_t) */
 #define TOUCAN_GET_VENDOR_URL          (CANPROP_GET_VENDOR_PROP + 0x18U)  /**< URL of Rusoku's website (uint23_t) */
 
+/* CAN API V3 compatible error codes */
+#define CANUSB_ERROR_FATAL     (-99)
+#define CANUSB_ERROR_NOTSUPP   (-98)
+#define CANUSB_ERROR_LIBRARY   (-97)
+#define CANUSB_ERROR_YETINIT   (-96)
+#define CANUSB_ERROR_NOTINIT   (-95)
+#define CANUSB_ERROR_NULLPTR   (-94)
+#define CANUSB_ERROR_ILLPARA   (-93)
+#define CANUSB_ERROR_HANDLE    (-92)
+#define CANUSB_ERROR_reserved  (-91)
+#define CANUSB_ERROR_RESOURCE  (-90)
+#define CANUSB_ERROR_TIMEOUT   (-50)
+#define CANUSB_ERROR_OVERRUN   (-40)
+#define CANUSB_ERROR_EMPTY     (-30)
+#define CANUSB_ERROR_BUSY      (-20)
+#define CANUSB_ERROR_OK          (0)
+/* MacCAN specific error codes */
+#define CANUSB_ERROR_STALLED   CANUSB_ERROR_BUSY
+#define CANUSB_SUCCESS         CANUSB_ERROR_OK
+
+/* CAN API V3 compatible board states */
+#define CANUSB_BOARD_NOT_AVAILABLE  (-1)
+#define CANUSB_BOARD_AVAILABLE       (0)
+#define CANUSB_BOARD_OCCUPIED       (+1)
+#define CANUSB_BOARD_NOT_TESTABLE   (-2)
+
 struct SChannelInfo {
     int32_t m_nChannelNo; ///< channel no. at actual index in the interface list
     char m_szDeviceName[CANPROP_MAX_BUFFER_SIZE]; ///< device name at actual index in the interface list

@@ -45,6 +45,8 @@ can_version_fp can_version;
 static void *lib_handler = NULL;
 static int device_handle = -1;
 uint32_t comm_device_cnt = 0;
+static can_message_t can_rx_msg = {};
+static can_message_t can_tx_msg = {};
 
 enum COMM_ERROR_CODES comm_init(char *error_code) {
     lib_handler = dlopen("libUVCANTOU.dylib", RTLD_LAZY);
@@ -214,27 +216,28 @@ enum COMM_ERROR_CODES comm_open_device(COMM_DEV_HANDLE dev_handle, struct INTERF
         return COMM_DEVICE_INIT_ERROR;
     }
     switch (comm_interface.bitrate) {
-        case 1000000: bitrate.index = (int32_t) CANBTR_INDEX_1M;
+        case 1000: bitrate.index = (int32_t) CANBTR_INDEX_1M;
             break;
-        case 800000: bitrate.index = (int32_t) CANBTR_INDEX_800K;
+        case 800: bitrate.index = (int32_t) CANBTR_INDEX_800K;
             break;
-        case 500000: bitrate.index = (int32_t) CANBTR_INDEX_500K;
+        case 500: bitrate.index = (int32_t) CANBTR_INDEX_500K;
             break;
-        case 250000: bitrate.index = (int32_t) CANBTR_INDEX_250K;
+        case 250: bitrate.index = (int32_t) CANBTR_INDEX_250K;
             break;
-        case 125000: bitrate.index = (int32_t) CANBTR_INDEX_125K;
+        case 125: bitrate.index = (int32_t) CANBTR_INDEX_125K;
             break;
-        case 100000: bitrate.index = (int32_t) CANBTR_INDEX_100K;
+        case 100: bitrate.index = (int32_t) CANBTR_INDEX_100K;
             break;
-        case 50000: bitrate.index = (int32_t) CANBTR_INDEX_50K;
+        case 50: bitrate.index = (int32_t) CANBTR_INDEX_50K;
             break;
-        case 20000: bitrate.index = (int32_t) CANBTR_INDEX_20K;
+        case 20: bitrate.index = (int32_t) CANBTR_INDEX_20K;
             break;
-        case 10000: bitrate.index = (int32_t) CANBTR_INDEX_10K;
+        case 10: bitrate.index = (int32_t) CANBTR_INDEX_10K;
             break;
         default: bitrate.index = (int32_t) CANBTR_INDEX_250K;
             break;
     }
+
     if (can_start(device_handle, &bitrate) < CANERR_NOERROR) {
         return COMM_DEVICE_INIT_ERROR;
     }
@@ -255,16 +258,32 @@ enum COMM_ERROR_CODES comm_get_device_data_available(COMM_DEV_HANDLE comm_dev_ha
 }
 
 enum COMM_ERROR_CODES comm_read_frame(COMM_DEV_HANDLE comm_dev_handle, struct COMM_CAN_MSG *comm_can_msg) {
+    if (device_handle < CANERR_NOERROR) {
+        return COMM_DEVICE_INIT_ERROR;
+    }
+
     if (comm_can_msg == NULL) {
         return COMM_LIB_ERROR_NULL;
     }
-    comm_can_msg->id = 0x123;
-    comm_can_msg->flags = 0;
-    comm_can_msg->length = 2;
-    comm_can_msg->data[0] = 0x12;
-    comm_can_msg->data[1] = 0x34;
 
-    usleep(1000);
+    memset(&can_rx_msg, 0, sizeof(can_rx_msg));
+    if (can_read(device_handle, &can_rx_msg, 0) != CANERR_NOERROR) {
+        return COMM_DEVICE_BUFFER_EMPTY;
+    }
+
+    comm_can_msg->id = can_rx_msg.id;
+    if (can_rx_msg.rtr) {
+        comm_can_msg->flags |= CAN_FLAG_RTR;
+        return COMM_SUCCESS;
+    }
+
+    if (can_rx_msg.xtd) {
+        comm_can_msg->flags |= CAN_FLAG_EXTENDED;
+    }
+
+    comm_can_msg->length = can_rx_msg.dlc;
+    memcpy(comm_can_msg->data, can_rx_msg.data, can_rx_msg.dlc & (CAN_MAX_LEN - 1));
+    usleep(1);
 
     return COMM_SUCCESS;
 }
@@ -273,5 +292,25 @@ enum COMM_ERROR_CODES comm_write_frame(COMM_DEV_HANDLE comm_dev_handle, struct C
     if (comm_can_msg == NULL) {
         return COMM_LIB_ERROR_NULL;
     }
+    if (device_handle < CANERR_NOERROR) {
+        return COMM_DEVICE_INIT_ERROR;
+    }
+
+    memset(&can_tx_msg, 0, sizeof(can_tx_msg));
+
+    can_tx_msg.id = comm_can_msg->id;
+    if (comm_can_msg->flags & CAN_FLAG_EXTENDED) {
+        can_tx_msg.xtd = true;
+    }
+
+    //can_tx_msg.dlc = comm_can_msg->length;
+    can_tx_msg.dlc = 1;//DEBUG
+    comm_can_msg->data[0] = 0x11;
+    memcpy(can_tx_msg.data, comm_can_msg->data, comm_can_msg->length & (CAN_MAX_LEN - 1));
+
+    if (can_write(device_handle, &can_tx_msg, 0) != CANERR_NOERROR) {
+        return COMM_DEVICE_IO_ERROR;
+    }
+
     return COMM_SUCCESS;
 }

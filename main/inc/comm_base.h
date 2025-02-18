@@ -33,7 +33,8 @@ enum COMM_ERROR_CODES {
     COMM_LIB_ERROR = 2,
     COMM_DEVICE_INIT_ERROR = 3,
     COMM_DEVICE_IO_ERROR = 4,
-    COMM_POINTER_ERROR = 5
+    COMM_POINTER_ERROR = 5,
+    COMM_DEVICE_BUFFER_EMPTY = 6
 };
 
 enum COMM_MANUFACTURER {
@@ -78,6 +79,7 @@ struct COMM_CAN_MSG {
     uint32_t error_status; // error counters (if CAN_FLAG_STATUS is set)
     uint32_t error_code; // error codes
     uint32_t flags; // can flags: STD, EXT, CAN FD etc.
+    uint64_t timestamp;
     uint8_t length;
     uint8_t data[64];
 };
