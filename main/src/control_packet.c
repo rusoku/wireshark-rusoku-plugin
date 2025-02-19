@@ -73,8 +73,6 @@ void *ctrl_read_thread(void *ptr) {
                     if (payload_length != 0) {
                         fread(buff, 1, payload_length, ctrl_in);
                         payload_length -= 2; // remove "0x" from string
-
-                        //PCAP_DEBUG("control:data_payload_length=%d\n", payload_length);
                         uint8_t tmp_buff[3] = {};
                         uint32_t buffer_index = 2, data_index = 0;
                         while (buffer_index <= payload_length) {
@@ -84,8 +82,8 @@ void *ctrl_read_thread(void *ptr) {
 
                             if (data_index > 7)
                                 continue;
-                            can_msg.data[data_index] = strtol((char *) tmp_buff, NULL, 16);
-                            data_index++;
+                            can_msg.data[data_index++] = strtol((char *) tmp_buff, NULL, 16);
+                            can_msg.length = data_index;
                         }
                     }
                     break;
@@ -98,7 +96,6 @@ void *ctrl_read_thread(void *ptr) {
         }
     }
 
-    PCAP_DEBUG("control:RETURN");
     return NULL;
 }
 

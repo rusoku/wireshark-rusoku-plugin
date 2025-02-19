@@ -282,7 +282,7 @@ enum COMM_ERROR_CODES comm_read_frame(COMM_DEV_HANDLE comm_dev_handle, struct CO
     }
 
     comm_can_msg->length = can_rx_msg.dlc;
-    memcpy(comm_can_msg->data, can_rx_msg.data, can_rx_msg.dlc & (CAN_MAX_LEN - 1));
+    memcpy(comm_can_msg->data, can_rx_msg.data, can_rx_msg.dlc %CAN_MAX_LEN);
     usleep(1);
 
     return COMM_SUCCESS;
@@ -303,10 +303,8 @@ enum COMM_ERROR_CODES comm_write_frame(COMM_DEV_HANDLE comm_dev_handle, struct C
         can_tx_msg.xtd = true;
     }
 
-    //can_tx_msg.dlc = comm_can_msg->length;
-    can_tx_msg.dlc = 1;//DEBUG
-    comm_can_msg->data[0] = 0x11;
-    memcpy(can_tx_msg.data, comm_can_msg->data, comm_can_msg->length & (CAN_MAX_LEN - 1));
+    can_tx_msg.dlc = comm_can_msg->length;
+    memcpy(can_tx_msg.data, comm_can_msg->data, comm_can_msg->length %CAN_MAX_LEN);
 
     if (can_write(device_handle, &can_tx_msg, 0) != CANERR_NOERROR) {
         return COMM_DEVICE_IO_ERROR;
