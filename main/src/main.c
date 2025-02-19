@@ -112,18 +112,20 @@ int main(int argc, char **argv) {
     // extcap-interfaces
     if (options[EXTCAP_INTERFACES].count) {
         printf(
-            "extcap {version=0.1.0.1}{help=https://www.rusoku.org}{display=RUSOKU CAN USB adapter extcap interface}\n");
+            "extcap {version=0.1}{help=https://www.rusoku.org}{display=RUSOKU CAN USB adapter extcap interface}\n");
 
         if (comm_get_device_list(comm_devices, &comm_device_cnt) != COMM_SUCCESS) {
             exit(EXIT_FAILURE);
         }
 
-        for (int index = 0; index < (comm_device_cnt & 7); index++) {
-            printf("interface {value=TouCAN %s}{display=%s CAN adapter interface %d - (%s %s s/n: %s)}\n",
+        for (int index = 0; index < (comm_device_cnt); index++) {
+            //printf("interface {value=TouCAN %s}{display=%s CAN adapter interface %d - (%s %s s/n: %s)}\n",
+            printf("interface {value=%d:%s}{display=%s %s s/n: %s)}\n",
+                   comm_devices[index].id,
                    //index,
                    comm_devices[index].serial,
-                   comm_devices[index].device_model_str,
-                   index,
+                   //comm_devices[index].device_model_str,
+                   //index,
                    comm_devices[index].manufacturer_str,
                    comm_devices[index].device_model_str,
                    comm_devices[index].serial);
@@ -209,7 +211,8 @@ int main(int argc, char **argv) {
 
     //extcap-bitrate-data
     if (options[PARAMETER_BITRATE_DATA].count) {
-        pcap_main_interface_parameters.bitrate_data = (int32_t) strtol(options[PARAMETER_BITRATE_DATA].argument, NULL, 10);
+        pcap_main_interface_parameters.bitrate_data = (int32_t) strtol(options[PARAMETER_BITRATE_DATA].argument, NULL,
+                                                                       10);
         //PCAP_DEBUG("main:bitrate_data=%s\n", options[PARAMETER_BITRATE_DATA].argument);
     }
 

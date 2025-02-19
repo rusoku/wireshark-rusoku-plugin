@@ -177,6 +177,7 @@ enum COMM_ERROR_CODES comm_get_device_list(struct COMM_DEVICE *comm_devices, uin
         if ((0 <= rc) && (state == CANBRD_PRESENT)) {
             devices_found++;
             comm_devices[x].id = info.m_nChannelNo;
+            //comm_devices[x].id = x;
             comm_devices[x].manufacturer = RUSOKU;
             comm_devices[x].device_model = TOUCAN;
             strcpy(comm_devices[x].manufacturer_str, info.m_szVendorName);
@@ -282,7 +283,7 @@ enum COMM_ERROR_CODES comm_read_frame(COMM_DEV_HANDLE comm_dev_handle, struct CO
     }
 
     comm_can_msg->length = can_rx_msg.dlc;
-    memcpy(comm_can_msg->data, can_rx_msg.data, can_rx_msg.dlc %CAN_MAX_LEN);
+    memcpy(comm_can_msg->data, can_rx_msg.data, can_rx_msg.dlc);
     usleep(1);
 
     return COMM_SUCCESS;
@@ -304,7 +305,7 @@ enum COMM_ERROR_CODES comm_write_frame(COMM_DEV_HANDLE comm_dev_handle, struct C
     }
 
     can_tx_msg.dlc = comm_can_msg->length;
-    memcpy(can_tx_msg.data, comm_can_msg->data, comm_can_msg->length %CAN_MAX_LEN);
+    memcpy(can_tx_msg.data, comm_can_msg->data, comm_can_msg->length);
 
     if (can_write(device_handle, &can_tx_msg, 0) != CANERR_NOERROR) {
         return COMM_DEVICE_IO_ERROR;
